@@ -1,8 +1,12 @@
-/* BootScreen styles
-   Semantic class names for the boot screen component.
-*/
-
 @layer components {
+    .Boot {
+        --promptbar-h: 96px;
+        @apply h-screen flex flex-col;
+
+        /* Reserve space for fixed PromptBar */
+        padding-bottom: var(--promptbar-h);
+    }
+
     /* Header */
     .Header {
         @apply w-full max-w-screen-2xl mx-auto px-6 pt-8 pb-4 bg-[#10141a] z-50;
@@ -23,7 +27,6 @@
         @apply font-['Space_Grotesk'];
     }
 
-    /* Icon sizing/alignment for the switch button. */
     .ButtonIndicator {
         @apply text-sm inline-block align-middle opacity-80;
     }
@@ -43,17 +46,20 @@
         @apply text-[1.25rem] md:text-[1.5rem] lg:text-[1.75rem];
     }
 
+    /* ✅ FIXED: Proper layout container */
+    .Output {
+        @apply flex-1 min-h-0 flex;
+    }
+
     /* Terminal card */
     .Terminal {
-        @apply flex-grow flex flex-col items-center justify-center;
-        @apply px-6 -mt-16;
+        @apply flex-1 flex items-center justify-center px-6;
     }
 
     .TerminalWindow {
-        @apply w-full max-w-3xl relative overflow-hidden;
-        @apply bg-[#181c22] rounded-md p-6;
-        @apply border border-[#dfe2eb]/10;
-        @apply shadow-[0_32px_64px_-12px_rgba(162,201,255,0.05)];
+        @apply w-full max-w-3xl relative overflow-hidden
+         bg-[#181c22] rounded-md p-6 border border-[#dfe2eb]/10
+        shadow-[0_32px_64px_-12px_rgba(162,201,255,0.05)];
     }
 
     .TerminalControls {
@@ -116,7 +122,6 @@
         @apply text-[#58a6ff] underline decoration-dotted underline-offset-4;
     }
 
-    /* Decorative glow element */
     .TerminalGlow {
         @apply absolute -bottom-12 -right-12 w-48 h-48 rounded-full blur-3xl;
         @apply bg-[#a2c9ff]/5;
