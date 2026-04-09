@@ -2,13 +2,17 @@
     <!-- Header -->
     <header class="Header">
         <div class="HeaderInner">
-        <button class="Button Button--switch">
-            <span class="material-symbols-outlined ButtonIndicator">settings_input_component</span>
-            <span class="ButtonText">Switch UI</span>
-        </button>
+            <button class="Button Button--switch">
+                <span class="material-symbols-outlined ButtonIndicator"
+                    >settings_input_component</span
+                >
+                <span class="ButtonText">Switch UI</span>
+            </button>
         </div>
         <div class="Banner">
-		<pre class="BannerText" data-text="rishi.sh">
+            <pre
+                class="BannerText"
+                data-text="rishi.sh">
 ██████╗ ██╗███████╗██╗  ██╗██╗      ███████╗██╗  ██╗
 ██╔══██╗██║██╔════╝██║  ██║██║      ██╔════╝██║  ██║
 ██████╔╝██║███████╗███████║██║█████╗███████╗███████║
@@ -18,72 +22,205 @@
 		    </pre>
         </div>
     </header>
-    
+
     <!-- Boot Card / Terminal -->
     <main class="Output">
         <section class="Terminal">
             <div class="TerminalWindow">
-        
-            <!-- Window Controls -->
-            <div class="TerminalControls">
-                <span class="TerminalDot TerminalDot--red"></span>
-                <span class="TerminalDot TerminalDot--gray"></span>
-                <span class="TerminalDot TerminalDot--blue"></span>
-            </div>
-        
-            <!-- Terminal Content -->
-            <div class="TerminalBody">
-                <div class="TerminalLog">
-        
-                <div class="TerminalLine">
-                    <span class="TerminalLineNumber">01</span>
-                    <p class="TerminalText">
-                    <span class="TerminalTag">[INFO]</span>
-                    booting rishi.sh...
-                    </p>
+                <!-- Window Controls -->
+                <div class="TerminalControls">
+                    <span class="TerminalDot TerminalDot--red"></span>
+                    <span class="TerminalDot TerminalDot--gray"></span>
+                    <span class="TerminalDot TerminalDot--blue"></span>
                 </div>
-        
-                <div class="TerminalLine">
-                    <span class="TerminalLineNumber">02</span>
-                    <p class="TerminalText">
-                    <span class="TerminalTag">[SYS]</span>
-                    initializing modules...
-                    </p>
-                </div>
-        
-                <div class="TerminalLine">
-                    <span class="TerminalLineNumber">03</span>
-                    <p class="TerminalText">
-                    <span class="TerminalTag">[FS]</span>
-                    loading projects...
-                    </p>
-                </div>
-        
-                <div class="TerminalLine TerminalLine--success">
-                    <span class="TerminalLineNumber">04</span>
-                    <p class="TerminalText">READY.</p>
-                </div>
-        
-                <div class="TerminalLine TerminalLine--hint">
-                    <span class="TerminalLineNumber">05</span>
-                    <p class="TerminalText">
-                    Type <span class="TerminalCommand">'help'</span> to begin.
-                    </p>
-                </div>
-        
-                </div>
-            </div>
-            <footer class="PromptBar">
-                <div class="PromptBarInner">
-                    <div class="Prompt">
-    				<span class="PromptHost">rishi@rishi.sh</span>
-        				<span class="PromptDim">:</span>
-        				<span class="PromptCwd">~</span>
-        				<span class="PromptDim">$</span>
-        				<span class="cursor-blink"></span>
+
+                <!-- Terminal Content -->
+                <div class="TerminalBody">
+                    <div class="TerminalLog" id="boot-log">
+                        <div
+                            class="TerminalLine"
+                            data-line="01"
+                            data-tag="[INFO]"
+                            data-text="booting rishi.sh..."
+                        >
+                            <span class="TerminalLineNumber">01</span>
+                            <p class="TerminalText">
+                                <span class="TerminalTag"></span>
+                                <span class="TerminalTyped"></span><span
+                                    class="TerminalCursor"
+                                    aria-hidden="true"></span>
+                            </p>
+                        </div>
+
+                        <div
+                            class="TerminalLine"
+                            data-line="02"
+                            data-tag="[SYS]"
+                            data-text="initializing modules..."
+                        >
+                            <span class="TerminalLineNumber">02</span>
+                            <p class="TerminalText">
+                                <span class="TerminalTag"></span>
+                                <span class="TerminalTyped"></span><span
+                                    class="TerminalCursor"
+                                    aria-hidden="true"></span>
+                            </p>
+                        </div>
+
+                        <div
+                            class="TerminalLine"
+                            data-line="03"
+                            data-tag="[FS]"
+                            data-text="loading projects..."
+                        >
+                            <span class="TerminalLineNumber">03</span>
+                            <p class="TerminalText">
+                                <span class="TerminalTag"></span>
+                                <span class="TerminalTyped"></span><span
+                                    class="TerminalCursor"
+                                    aria-hidden="true"></span>
+                            </p>
+                        </div>
+
+                        <div
+                            class="TerminalLine TerminalLine--success"
+                            data-line="04"
+                            data-tag=""
+                            data-text="READY."
+                        >
+                            <span class="TerminalLineNumber">04</span>
+                            <p class="TerminalText">
+                                <span class="TerminalTyped"></span><span
+                                    class="TerminalCursor"
+                                    aria-hidden="true"></span>
+                            </p>
+                        </div>
+
+                        <div
+                            class="TerminalLine TerminalLine--hint"
+                            data-line="05"
+                            data-tag=""
+                            data-text="Type 'help' to begin."
+                        >
+                            <span class="TerminalLineNumber">05</span>
+                            <p class="TerminalText">
+                                <span class="TerminalTyped"></span><span
+                                    class="TerminalCursor"
+                                    aria-hidden="true"></span>
+                            </p>
+                        </div>
                     </div>
+
+                    <script>
+                        const log = document.getElementById("boot-log");
+                        if (!log) {
+                            console.warn(
+                                "[boot] #boot-log not found; skipping boot typing animation.",
+                            );
+                        } else {
+                            const sleep = (ms) =>
+                                new Promise((r) => setTimeout(r, ms));
+
+                            // Jitter settings (tune these)
+                            const BASE_CHAR_DELAY = 18; // average ms per char
+                            const JITTER = 26; // +/- randomness
+                            const LINE_PAUSE_MIN = 120; // pause between lines
+                            const LINE_PAUSE_JITTER = 240;
+
+                            const allLines = Array.from(
+                                log.querySelectorAll(".TerminalLine"),
+                            );
+
+                            // Hide all cursors initially
+                            for (const line of allLines) {
+                                const cursor =
+                                    line.querySelector(".TerminalCursor");
+                                if (cursor) cursor.style.display = "none";
+                            }
+
+                            const randInt = (min, max) =>
+                                Math.floor(Math.random() * (max - min + 1)) +
+                                min;
+
+                            const typeLine = async (lineEl) => {
+                                const tagEl =
+                                    lineEl.querySelector(".TerminalTag");
+                                const typedEl =
+                                    lineEl.querySelector(".TerminalTyped");
+                                const cursorEl =
+                                    lineEl.querySelector(".TerminalCursor");
+
+                                if (!typedEl) return;
+
+                                const tag =
+                                    lineEl.getAttribute("data-tag") || "";
+                                const text =
+                                    lineEl.getAttribute("data-text") || "";
+
+                                // Render tag (if any)
+                                if (tagEl) {
+                                    tagEl.textContent = tag ? tag + " " : "";
+                                }
+
+                                // Move cursor to this active line
+                                if (cursorEl)
+                                    cursorEl.style.display = "inline";
+
+                                typedEl.textContent = "";
+
+                                for (let i = 0; i < text.length; i++) {
+                                    typedEl.textContent += text[i];
+
+                                    // occasional longer stalls to feel "systemy"
+                                    const isPunctuation = /[.,:;!?]/.test(
+                                        text[i],
+                                    );
+                                    const stall = isPunctuation
+                                        ? randInt(40, 140)
+                                        : 0;
+
+                                    const delay = Math.max(
+                                        0,
+                                        BASE_CHAR_DELAY +
+                                            randInt(-JITTER, JITTER) +
+                                            stall,
+                                    );
+
+                                    await sleep(delay);
+                                }
+
+                                // Done typing this line, hide cursor here
+                                if (cursorEl) cursorEl.style.display = "none";
+
+                                // Pause between lines
+                                await sleep(
+                                    LINE_PAUSE_MIN +
+                                        randInt(0, LINE_PAUSE_JITTER),
+                                );
+                            };
+
+                            (async () => {
+                                for (const line of allLines) {
+                                    await typeLine(line);
+                                }
+
+                                // Optional: after boot finishes, you can trigger footer cursor emphasis, etc.
+                            })();
+                        }
+                    </script>
+
+                    <footer class="PromptBar">
+                        <div class="PromptBarInner">
+                            <div class="Prompt">
+                                <span class="PromptHost">rishi@rishi.sh</span>
+                                <span class="PromptDim">:</span>
+                                <span class="PromptCwd">~</span>
+                                <span class="PromptDim">$</span>
+                                <span class="cursor-blink"></span>
+                            </div>
+                        </div>
+                    </footer>
                 </div>
-            </footer>
             </div>
         </section>
     </main>
