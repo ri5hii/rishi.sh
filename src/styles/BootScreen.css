@@ -35,15 +35,122 @@
         @apply leading-none;
     }
 
-    /* ASCII title block */
-    .AsciiTitle {
-        @apply text-center uppercase tracking-tighter leading-none;
-        @apply text-[#a2c9ff] font-['Space_Grotesk'] text-[3.5rem];
+    /* Banner */
+    .Banner {
+        @apply w-full flex justify-center;
     }
 
-    .AsciiArt {
-        @apply font-mono whitespace-pre leading-none opacity-80 mb-4;
+    .BannerStack {
+        position: relative;
+        display: inline-block;
+        text-align: left;
+    }
+
+    .BannerText {
+        @apply font-mono whitespace-pre leading-none;
         @apply text-[1.25rem] md:text-[1.5rem] lg:text-[1.75rem];
+        margin: 0;
+        color: #dfe2eb;
+        text-align: left;
+    }
+
+    .BannerText--sizer {
+        position: relative;
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+    .BannerText--frame-base,
+    .BannerText--frame-glitchA,
+    .BannerText--frame-base2,
+    .BannerText--frame-glitchB {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .BannerText--frame-base {
+        animation: frame-base 3s infinite steps(1, end);
+    }
+
+    .BannerText--frame-glitchA {
+        animation: frame-glitch-a 3s infinite steps(1, end);
+    }
+
+    .BannerText--frame-base2 {
+        animation: frame-base2 3s infinite steps(1, end);
+    }
+
+    .BannerText--frame-glitchB {
+        animation: frame-glitch-b 3s infinite steps(1, end);
+    }
+
+    /* Gapless frame cycle: base -> glitchA -> base2 -> glitchB */
+    @keyframes frame-base {
+        0%,
+        25% {
+            opacity: 1;
+        }
+        25.0001%,
+        100% {
+            opacity: 0;
+        }
+    }
+
+    @keyframes frame-glitch-a {
+        0%,
+        25% {
+            opacity: 0;
+        }
+        25.0001%,
+        50% {
+            opacity: 1;
+        }
+        50.0001%,
+        100% {
+            opacity: 0;
+        }
+    }
+
+    @keyframes frame-base2 {
+        0%,
+        50% {
+            opacity: 0;
+        }
+        50.0001%,
+        75% {
+            opacity: 1;
+        }
+        75.0001%,
+        100% {
+            opacity: 0;
+        }
+    }
+
+    @keyframes frame-glitch-b {
+        0%,
+        75% {
+            opacity: 0;
+        }
+        75.0001%,
+        100% {
+            opacity: 1;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .BannerText--frame-glitchA,
+        .BannerText--frame-glitchB {
+            animation: none;
+            opacity: 0;
+        }
+
+        .BannerText--frame-base,
+        .BannerText--frame-base2 {
+            animation: none;
+            opacity: 1;
+        }
     }
 
     /* ✅ FIXED: Proper layout container */
