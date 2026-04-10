@@ -15,10 +15,10 @@
                 data-text="rishi.sh">
 ██████╗ ██╗███████╗██╗  ██╗██╗      ███████╗██╗  ██╗
 ██╔══██╗██║██╔════╝██║  ██║██║      ██╔════╝██║  ██║
-██████╔╝██║███████╗███████║██║█████╗███████╗███████║
-██╔══██╗██║╚════██║██╔══██║██║╚════╝╚════██║██╔══██║
-██║  ██║██║███████║██║  ██║██║      ███████║██║  ██║
-╚═╝  ╚═╝╚═╝╚══════╝╚═╝  ╚═╝╚═╝      ╚══════╝╚═╝  ╚═╝
+██████╔╝██║███████╗███████║██║      ███████╗███████║
+██╔══██╗██║╚════██║██╔══██║██║      ╚════██║██╔══██║
+██║  ██║██║███████║██║  ██║██║  ██╗ ███████║██║  ██║
+╚═╝  ╚═╝╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚══════╝╚═╝  ╚═╝   
 		    </pre>
         </div>
     </header>
@@ -37,76 +37,41 @@
                 <!-- Terminal Content -->
                 <div class="TerminalBody">
                     <div class="TerminalLog" id="boot-log">
-                        <div
-                            class="TerminalLine"
-                            data-line="01"
-                            data-tag="[INFO]"
-                            data-text="booting rishi.sh..."
-                        >
+                        <div class="TerminalLine" data-line="01" data-tag="[INFO]" data-text="booting rishi.sh...">
                             <span class="TerminalLineNumber">01</span>
                             <p class="TerminalText">
                                 <span class="TerminalTag"></span>
-                                <span class="TerminalTyped"></span><span
-                                    class="TerminalCursor"
-                                    aria-hidden="true"></span>
+                                <span class="TerminalTyped"></span>
                             </p>
                         </div>
 
-                        <div
-                            class="TerminalLine"
-                            data-line="02"
-                            data-tag="[SYS]"
-                            data-text="initializing modules..."
-                        >
+                        <div class="TerminalLine" data-line="02" data-tag="[SYS]" data-text="initializing modules...">
                             <span class="TerminalLineNumber">02</span>
                             <p class="TerminalText">
                                 <span class="TerminalTag"></span>
-                                <span class="TerminalTyped"></span><span
-                                    class="TerminalCursor"
-                                    aria-hidden="true"></span>
+                                <span class="TerminalTyped"></span>
                             </p>
                         </div>
 
-                        <div
-                            class="TerminalLine"
-                            data-line="03"
-                            data-tag="[FS]"
-                            data-text="loading projects..."
-                        >
+                        <div class="TerminalLine" data-line="03" data-tag="[FS]" data-text="loading projects...">
                             <span class="TerminalLineNumber">03</span>
                             <p class="TerminalText">
                                 <span class="TerminalTag"></span>
-                                <span class="TerminalTyped"></span><span
-                                    class="TerminalCursor"
-                                    aria-hidden="true"></span>
+                                <span class="TerminalTyped"></span>
                             </p>
                         </div>
 
-                        <div
-                            class="TerminalLine TerminalLine--success"
-                            data-line="04"
-                            data-tag=""
-                            data-text="READY."
-                        >
+                        <div class="TerminalLine TerminalLine--success" data-line="04" data-tag="" data-text="READY.">
                             <span class="TerminalLineNumber">04</span>
                             <p class="TerminalText">
-                                <span class="TerminalTyped"></span><span
-                                    class="TerminalCursor"
-                                    aria-hidden="true"></span>
+                                <span class="TerminalTyped"></span>
                             </p>
                         </div>
 
-                        <div
-                            class="TerminalLine TerminalLine--hint"
-                            data-line="05"
-                            data-tag=""
-                            data-text="Type 'help' to begin."
-                        >
+                        <div class="TerminalLine TerminalLine--hint" data-line="05" data-tag="" data-text="Type 'help' to begin.">
                             <span class="TerminalLineNumber">05</span>
                             <p class="TerminalText">
-                                <span class="TerminalTyped"></span><span
-                                    class="TerminalCursor"
-                                    aria-hidden="true"></span>
+                                <span class="TerminalTyped"></span>
                             </p>
                         </div>
                     </div>
@@ -131,13 +96,6 @@
                                 log.querySelectorAll(".TerminalLine"),
                             );
 
-                            // Hide all cursors initially
-                            for (const line of allLines) {
-                                const cursor =
-                                    line.querySelector(".TerminalCursor");
-                                if (cursor) cursor.style.display = "none";
-                            }
-
                             const randInt = (min, max) =>
                                 Math.floor(Math.random() * (max - min + 1)) +
                                 min;
@@ -147,9 +105,6 @@
                                     lineEl.querySelector(".TerminalTag");
                                 const typedEl =
                                     lineEl.querySelector(".TerminalTyped");
-                                const cursorEl =
-                                    lineEl.querySelector(".TerminalCursor");
-
                                 if (!typedEl) return;
 
                                 const tag =
@@ -161,10 +116,6 @@
                                 if (tagEl) {
                                     tagEl.textContent = tag ? tag + " " : "";
                                 }
-
-                                // Move cursor to this active line
-                                if (cursorEl)
-                                    cursorEl.style.display = "inline";
 
                                 typedEl.textContent = "";
 
@@ -189,9 +140,6 @@
                                     await sleep(delay);
                                 }
 
-                                // Done typing this line, hide cursor here
-                                if (cursorEl) cursorEl.style.display = "none";
-
                                 // Pause between lines
                                 await sleep(
                                     LINE_PAUSE_MIN +
@@ -199,12 +147,20 @@
                                 );
                             };
 
+                            const promptInput =
+                                document.getElementById("prompt-input");
+                            if (promptInput) promptInput.disabled = true;
+
                             (async () => {
                                 for (const line of allLines) {
                                     await typeLine(line);
                                 }
 
-                                // Optional: after boot finishes, you can trigger footer cursor emphasis, etc.
+                                // Enable prompt input/cursor after the help line finishes.
+                                if (promptInput) {
+                                    promptInput.disabled = false;
+                                    promptInput.focus();
+                                }
                             })();
                         }
                     </script>
@@ -212,11 +168,13 @@
                     <footer class="PromptBar">
                         <div class="PromptBarInner">
                             <div class="Prompt">
-                                <span class="PromptHost">rishi@rishi.sh</span>
-                                <span class="PromptDim">:</span>
-                                <span class="PromptCwd">~</span>
-                                <span class="PromptDim">$</span>
-                                <span class="cursor-blink"></span>
+                                <span class="PromptPrefix">
+                                    <span class="PromptHost">rishi@rishi.sh</span>
+                                    <span class="PromptDim">:</span>
+                                    <span class="PromptCwd">~</span>
+                                    <span class="PromptDim">$</span>
+                                </span>
+                                <input id="prompt-input" class="PromptInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" disabled />
                             </div>
                         </div>
                     </footer>
