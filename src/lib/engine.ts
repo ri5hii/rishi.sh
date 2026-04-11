@@ -53,6 +53,47 @@ export const executeCommand = async (input: string): Promise<EngineResult> => {
     };
   }
 
+  if (command === "neofetch") {
+    const compact = args.includes("--compact") || args.includes("-c");
+
+    if (compact) {
+      return {
+        output: [
+          "rishi.sh :: profile",
+          "name      : Hrishikesh Vadla",
+          "focus     : AI/ML, Cybersecurity, Systems",
+          "stack     : Python, Rust, Go, FastAPI, Docker",
+          "location  : India",
+          "status    : Building secure intelligent systems",
+        ].join("\n"),
+      };
+    }
+
+    return {
+      output: [
+        "                  .',;::::;,'..                     rishi.sh",
+        "             .';:cccccccccccc:;,.                   --------",
+        "          .;cccccccccccccccccccccc;.                name      : Hrishikesh Vadla",
+        "        .:cccccccccccccccccccccccccc:.              focus     : AI/ML + Cybersecurity",
+        "      .;ccccccccccccc;.:dddl:.;ccccccc;.            stack     : Python, Rust, Go",
+        "     .:ccccccccccccc;OWMKOOXMWd;ccccccc:.           tools     : FastAPI, Docker, AWS",
+        "    .:ccccccccccccc;KMMc;cc;xMMc;ccccccc:.          interests : Adversarial defense,",
+        "    ,cccccccccccccc;MMM.;cc;;WW:;cccccccc,                       LLM systems, DevSecOps",
+        "    :cccccccccccccc;MMM.;cccccccccccccccc:          quote     : secure intelligence",
+        "    :ccccccc;oxOOOo;MMM000k.;cccccccccccc:",
+        "    cccccc;0MMKxdd:;MMMkddc.;cccccccccccc;",
+        "    ccccc;XMO';cccc;MMM.;cccccccccccccccc'",
+        "    ccccc;MMo;ccccc;MMW.;ccccccccccccccc;",
+        "    ccccc;0MNc.ccc.xMMd;ccccccccccccccc;",
+        "    cccccc;dNMWXXXWM0:;cccccccccccccc:,",
+        "    cccccccc;.:odl:.;cccccccccccccc:,.",
+        "    cccccccccccccccccccccccccccccc:'.",
+        "    :ccccccccccccccccccccccc:;,..",
+        "     ':cccccccccccccccc::;,.",
+      ].join("\n"),
+    };
+  }
+
   if (command in COMMANDS) {
     // Temporary stubs for v0.2 phase 1:
     return { output: `${command}: command implementation in progress.` };
