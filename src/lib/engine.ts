@@ -10,6 +10,8 @@ export type EngineResult = {
   outputMode?: OutputMode;
   clear?: boolean;
   error?: boolean;
+  openUrl?: string;
+  openInNewTab?: boolean;
 };
 
 const parseInput = (input: string) => {
@@ -120,6 +122,34 @@ export const executeCommand = async (input: string): Promise<EngineResult> => {
   }
 
   if (command === "contact") {
+    const openGitHub = args.includes("--github") || args.includes("-g");
+    const openLinkedIn = args.includes("--linkedin") || args.includes("-l");
+    const openEmail = args.includes("--email") || args.includes("-e");
+
+    if (openGitHub || openLinkedIn || openEmail) {
+      if (openGitHub) {
+        return {
+          output: "Opening GitHub profile...",
+          openUrl: "https://github.com/ri5hii",
+          openInNewTab: true,
+        };
+      }
+
+      if (openLinkedIn) {
+        return {
+          output: "Opening LinkedIn profile...",
+          openUrl: "https://www.linkedin.com/in/hrishikesh-vadla/",
+          openInNewTab: true,
+        };
+      }
+
+      return {
+        output: "Opening email client...",
+        openUrl: "mailto:rishi.0.4789@gmail.com",
+        openInNewTab: false,
+      };
+    }
+
     return {
       outputMode: "html",
       output: [

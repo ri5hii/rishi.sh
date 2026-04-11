@@ -69,7 +69,9 @@ const buildProjectHeaderHtml = (repo: RepoDetail) => {
 
   badges.push(buildBadgeImg("Stars", String(repo.stargazers_count), "f59e0b"));
   badges.push(buildBadgeImg("Forks", String(repo.forks_count), "0ea5e9"));
-  badges.push(buildBadgeImg("Issues", String(repo.open_issues_count), "ef4444"));
+  badges.push(
+    buildBadgeImg("Issues", String(repo.open_issues_count), "ef4444"),
+  );
 
   const topics = (repo.topics ?? []).slice(0, 8);
   for (const topic of topics) {
@@ -170,10 +172,14 @@ export const fetchProjectsIndexHtml = async (
   return html;
 };
 
-export const fetchProjectReadmeHtml = async (repoName: string): Promise<string> => {
+export const fetchProjectReadmeHtml = async (
+  repoName: string,
+): Promise<string> => {
   const normalized = repoName.trim();
   if (!normalized) {
-    throw new Error("Please provide a repository name. Example: projects rishi.sh");
+    throw new Error(
+      "Please provide a repository name. Example: projects rishi.sh",
+    );
   }
 
   const cacheKey = normalized.toLowerCase();
@@ -201,10 +207,7 @@ export const fetchProjectReadmeHtml = async (repoName: string): Promise<string> 
   const repoMeta = await fetchRepoDetail(normalized);
   const header = buildProjectHeaderHtml(repoMeta);
 
-  const html = [
-    header,
-    rendered,
-  ].join("\n");
+  const html = [header, rendered].join("\n");
 
   projectReadmeCache.set(cacheKey, html);
   return html;

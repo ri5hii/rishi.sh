@@ -18,7 +18,8 @@ export type CommandDefinition = {
 export const COMMANDS: Record<string, CommandDefinition> = {
   help: {
     name: "help",
-    description: "Display available commands or detailed help for a specific command.",
+    description:
+      "Display available commands or detailed help for a specific command.",
     usage: ["help", "help <command>"],
     examples: ["help", "help projects", "help neofetch"],
     flags: [],
@@ -55,7 +56,23 @@ export const COMMANDS: Record<string, CommandDefinition> = {
     description: "Show contact and social links.",
     usage: ["contact"],
     examples: ["contact"],
-    flags: [],
+    flags: [
+      {
+        long: "--github",
+        short: "-g",
+        description: "Open the GitHub profile directly.",
+      },
+      {
+        long: "--linkedin",
+        short: "-l",
+        description: "Open the LinkedIn profile directly.",
+      },
+      {
+        long: "--email",
+        short: "-e",
+        description: "Open the default mail client.",
+      },
+    ],
   },
   whoami: {
     name: "whoami",
