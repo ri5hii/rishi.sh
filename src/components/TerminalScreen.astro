@@ -10,7 +10,12 @@
     <!-- Terminal Content -->
     <div class="TerminalBody">
       <div class="TerminalLog" id="boot-log">
-        <div class="TerminalLine" data-line="01" data-tag="[INFO]" data-text="rishi.sh...">
+        <div
+          class="TerminalLine"
+          data-line="01"
+          data-tag="[INFO]"
+          data-text="rishi.sh..."
+        >
           <span class="TerminalLineNumber">01</span>
           <p class="TerminalText">
             <span class="TerminalTag"></span>
@@ -18,7 +23,12 @@
           </p>
         </div>
 
-        <div class="TerminalLine" data-line="02" data-tag="[SYS]" data-text="initializing modules...">
+        <div
+          class="TerminalLine"
+          data-line="02"
+          data-tag="[SYS]"
+          data-text="initializing modules..."
+        >
           <span class="TerminalLineNumber">02</span>
           <p class="TerminalText">
             <span class="TerminalTag"></span>
@@ -26,7 +36,12 @@
           </p>
         </div>
 
-        <div class="TerminalLine" data-line="03" data-tag="[FS]" data-text="loading projects...">
+        <div
+          class="TerminalLine"
+          data-line="03"
+          data-tag="[FS]"
+          data-text="loading projects..."
+        >
           <span class="TerminalLineNumber">03</span>
           <p class="TerminalText">
             <span class="TerminalTag"></span>
@@ -34,14 +49,24 @@
           </p>
         </div>
 
-        <div class="TerminalLine TerminalLine--success" data-line="04" data-tag="" data-text="READY.">
+        <div
+          class="TerminalLine TerminalLine--success"
+          data-line="04"
+          data-tag=""
+          data-text="READY."
+        >
           <span class="TerminalLineNumber">04</span>
           <p class="TerminalText">
             <span class="TerminalTyped"></span>
           </p>
         </div>
 
-        <div class="TerminalLine TerminalLine--hint" data-line="05" data-tag="" data-text="Type 'help' to begin.">
+        <div
+          class="TerminalLine TerminalLine--hint"
+          data-line="05"
+          data-tag=""
+          data-text="Type 'help' to begin."
+        >
           <span class="TerminalLineNumber">05</span>
           <p class="TerminalText">
             <span class="TerminalTyped"></span>
@@ -60,9 +85,102 @@
           "prompt-input",
         ) as HTMLInputElement | null;
 
+        const sanitizeHtml = (unsafeHtml: string): string => {
+          const template = document.createElement("template");
+          template.innerHTML = unsafeHtml;
+
+          const allowedTags = new Set([
+            "a",
+            "blockquote",
+            "br",
+            "code",
+            "details",
+            "div",
+            "em",
+            "h1",
+            "h2",
+            "h3",
+            "h4",
+            "h5",
+            "h6",
+            "hr",
+            "img",
+            "li",
+            "ol",
+            "p",
+            "pre",
+            "span",
+            "strong",
+            "summary",
+            "table",
+            "tbody",
+            "td",
+            "th",
+            "thead",
+            "tr",
+            "ul",
+          ]);
+
+          const allowedAttributes: Record<string, Set<string>> = {
+            "*": new Set(["class", "align"]),
+            a: new Set(["href", "title", "target", "rel"]),
+            img: new Set(["src", "alt", "title", "width", "height"]),
+            details: new Set(["open"]),
+          };
+
+          const isSafeUrl = (url: string) => {
+            const trimmed = url.trim();
+            if (!trimmed) return false;
+            return (
+              trimmed.startsWith("https://") ||
+              trimmed.startsWith("http://") ||
+              trimmed.startsWith("mailto:")
+            );
+          };
+
+          const elements = template.content.querySelectorAll("*");
+          for (const element of elements) {
+            const tag = element.tagName.toLowerCase();
+
+            if (!allowedTags.has(tag)) {
+              element.replaceWith(...Array.from(element.childNodes));
+              continue;
+            }
+
+            const globalAllowed = allowedAttributes["*"];
+            const tagAllowed = allowedAttributes[tag] ?? new Set<string>();
+
+            for (const attr of Array.from(element.attributes)) {
+              const attrName = attr.name.toLowerCase();
+              const allowed =
+                globalAllowed.has(attrName) || tagAllowed.has(attrName);
+
+              if (!allowed) {
+                element.removeAttribute(attr.name);
+                continue;
+              }
+
+              if (
+                (attrName === "href" || attrName === "src") &&
+                !isSafeUrl(attr.value)
+              ) {
+                element.removeAttribute(attr.name);
+              }
+            }
+
+            if (tag === "a") {
+              element.setAttribute("target", "_blank");
+              element.setAttribute("rel", "noopener noreferrer");
+            }
+          }
+
+          return template.innerHTML;
+        };
+
         const appendBlock = (
           command: string,
           output: string,
+          outputMode: "text" | "html" = "text",
           isError = false,
         ) => {
           if (!sessionLog) return;
@@ -84,14 +202,26 @@
           commandLine.appendChild(promptSpan);
           commandLine.appendChild(commandSpan);
 
-          const outputPre = document.createElement("pre");
-          outputPre.className = isError
-            ? "SessionOutput SessionOutput--error"
-            : "SessionOutput";
-          outputPre.textContent = output;
+          let outputNode: HTMLElement;
+
+          if (outputMode === "html") {
+            const outputRich = document.createElement("div");
+            outputRich.className = isError
+              ? "SessionOutput SessionOutputRich SessionOutput--error"
+              : "SessionOutput SessionOutputRich";
+            outputRich.innerHTML = sanitizeHtml(output);
+            outputNode = outputRich;
+          } else {
+            const outputPre = document.createElement("pre");
+            outputPre.className = isError
+              ? "SessionOutput SessionOutput--error"
+              : "SessionOutput";
+            outputPre.textContent = output;
+            outputNode = outputPre;
+          }
 
           block.appendChild(commandLine);
-          block.appendChild(outputPre);
+          block.appendChild(outputNode);
           sessionLog.appendChild(block);
 
           sessionLog.scrollTop = sessionLog.scrollHeight;
@@ -163,7 +293,7 @@
           let hasEnteredSessionMode = false;
           const bootRoot = document.querySelector(".Boot");
 
-          inputEl.addEventListener("keydown", (e: KeyboardEvent) => {
+          inputEl.addEventListener("keydown", async (e: KeyboardEvent) => {
             if (e.key !== "Enter") return;
             e.preventDefault();
 
@@ -177,17 +307,22 @@
             }
 
             try {
-              const result = executeCommand(raw);
+              const result = await executeCommand(raw);
 
               if (result.clear) {
                 clearSession();
               } else {
-                appendBlock(raw, result.output, Boolean(result.error));
+                appendBlock(
+                  raw,
+                  result.output,
+                  result.outputMode ?? "text",
+                  Boolean(result.error),
+                );
               }
             } catch (error) {
               const message =
                 error instanceof Error ? error.message : String(error);
-              appendBlock(raw, `Runtime error: ${message}`, true);
+              appendBlock(raw, `Runtime error: ${message}`, "text", true);
             } finally {
               inputEl.value = "";
             }
@@ -228,7 +363,15 @@
               <span class="PromptCwd">~</span>
               <span class="PromptDim">$</span>
             </span>
-            <input id="prompt-input" class="PromptInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" disabled/>
+            <input
+              id="prompt-input"
+              class="PromptInput"
+              type="text"
+              autocomplete="off"
+              autocapitalize="off"
+              spellcheck="false"
+              disabled
+            />
           </div>
         </div>
       </footer>

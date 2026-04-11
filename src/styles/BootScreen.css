@@ -297,6 +297,81 @@
     margin: 0;
   }
 
+  .SessionOutputRich {
+    @apply mt-2 text-[#dfe2eb] text-sm md:text-base;
+    white-space: normal;
+    background: transparent;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+  }
+
+  .SessionOutputRich > :first-child {
+    margin-top: 0;
+  }
+
+  .SessionOutputRich > :last-child {
+    margin-bottom: 0;
+  }
+
+  .SessionOutputRich h1,
+  .SessionOutputRich h2,
+  .SessionOutputRich h3,
+  .SessionOutputRich h4 {
+    @apply text-[#a2c9ff] font-semibold;
+    margin: 0.9rem 0 0.45rem;
+    line-height: 1.25;
+  }
+
+  .SessionOutputRich p,
+  .SessionOutputRich ul,
+  .SessionOutputRich ol,
+  .SessionOutputRich blockquote {
+    margin: 0.6rem 0;
+  }
+
+  .SessionOutputRich ul,
+  .SessionOutputRich ol {
+    padding-left: 1.25rem;
+  }
+
+  .SessionOutputRich li {
+    margin: 0.2rem 0;
+  }
+
+  .SessionOutputRich pre,
+  .SessionOutputRich code {
+    @apply font-mono text-[#dfe2eb];
+    background: rgba(223, 226, 235, 0.06);
+  }
+
+  .SessionOutputRich pre {
+    padding: 0.65rem 0.75rem;
+    border: 1px solid rgba(223, 226, 235, 0.15);
+    overflow-x: auto;
+  }
+
+  .SessionOutputRich code {
+    padding: 0.08rem 0.3rem;
+  }
+
+  .SessionOutputRich a {
+    @apply text-[#58a6ff] underline;
+  }
+
+  .SessionOutputRich img {
+    display: inline-block;
+    max-width: 100%;
+    height: auto;
+    vertical-align: middle;
+  }
+
+  .SessionOutputRich table {
+    width: 100%;
+    display: block;
+    overflow-x: auto;
+    border-collapse: collapse;
+  }
+
   .SessionOutput--error {
     @apply text-[#ffb4ab];
   }

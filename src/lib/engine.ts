@@ -1,8 +1,12 @@
+import { fetchAboutRenderedHtml } from "./about";
 import { COMMANDS } from "./commands";
 import { renderHelpCommand, renderHelpIndex } from "./help";
 
+export type OutputMode = "text" | "html";
+
 export type EngineResult = {
   output: string;
+  outputMode?: OutputMode;
   clear?: boolean;
   error?: boolean;
 };
@@ -14,7 +18,7 @@ const parseInput = (input: string) => {
   return { command, args };
 };
 
-export const executeCommand = (input: string): EngineResult => {
+export const executeCommand = async (input: string): Promise<EngineResult> => {
   const trimmed = input.trim();
   if (!trimmed) return { output: "" };
 
@@ -27,6 +31,19 @@ export const executeCommand = (input: string): EngineResult => {
 
   if (command === "cls") {
     return { output: "", clear: true };
+  }
+
+  if (command === "about") {
+    try {
+      const html = await fetchAboutRenderedHtml();
+      return {
+        output: html,
+        outputMode: "html",
+      };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      return { output: `about: ${message}`, error: true };
+    }
   }
 
   if (command in COMMANDS) {
