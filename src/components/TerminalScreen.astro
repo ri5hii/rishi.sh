@@ -323,6 +323,11 @@
                   Boolean(result.error),
                 );
               }
+
+              if (result.openUrl) {
+                const target = result.openInNewTab ? "_blank" : "_self";
+                window.open(result.openUrl, target, "noopener,noreferrer");
+              }
             } catch (error) {
               const message =
                 error instanceof Error ? error.message : String(error);

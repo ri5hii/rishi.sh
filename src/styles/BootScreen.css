@@ -387,6 +387,20 @@
     vertical-align: middle;
   }
 
+  .SessionOutputRich .ProjectBadgeRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    align-items: center;
+    margin: 0.6rem 0 0.85rem;
+  }
+
+  .SessionOutputRich .ProjectBadgeRow img {
+    display: inline-block;
+    max-width: none;
+    height: 20px;
+  }
+
   .SessionOutputRich table {
     width: 100%;
     display: block;

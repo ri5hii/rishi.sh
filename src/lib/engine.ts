@@ -1,6 +1,7 @@
 import { fetchAboutRenderedHtml } from "./about";
 import { COMMANDS } from "./commands";
 import { renderHelpCommand, renderHelpIndex } from "./help";
+import { fetchProjectReadmeHtml, fetchProjectsIndexHtml } from "./projects";
 
 export type OutputMode = "text" | "html";
 
@@ -43,6 +44,30 @@ export const executeCommand = async (input: string): Promise<EngineResult> => {
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       return { output: `about: ${message}`, error: true };
+    }
+  }
+
+  if (command === "projects") {
+    const includeAll = args.includes("--all") || args.includes("-a");
+    const repoArg = args.find((arg) => !arg.startsWith("-"));
+
+    try {
+      if (!repoArg) {
+        const html = await fetchProjectsIndexHtml(includeAll);
+        return {
+          output: html,
+          outputMode: "html",
+        };
+      }
+
+      const html = await fetchProjectReadmeHtml(repoArg);
+      return {
+        output: html,
+        outputMode: "html",
+      };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      return { output: `projects: ${message}`, error: true };
     }
   }
 
@@ -90,6 +115,21 @@ export const executeCommand = async (input: string): Promise<EngineResult> => {
         "    cccccccccccccccccccccccccccccc:'.",
         "    :ccccccccccccccccccccccc:;,..",
         "     ':cccccccccccccccc::;,.",
+      ].join("\n"),
+    };
+  }
+
+  if (command === "contact") {
+    return {
+      outputMode: "html",
+      output: [
+        "<h2>Contact</h2>",
+        "<p>Let\'s connect:</p>",
+        "<ul>",
+        '<li>Email: <a href="mailto:rishi.0.4789@gmail.com">rishi.0.4789@gmail.com</a></li>',
+        '<li>LinkedIn: <a href="https://www.linkedin.com/in/hrishikesh-vadla/">hrishikesh-vadla</a></li>',
+        '<li>GitHub: <a href="https://github.com/ri5hii">github.com/ri5hii</a></li>',
+        "</ul>",
       ].join("\n"),
     };
   }
