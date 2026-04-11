@@ -164,6 +164,14 @@ export const executeCommand = async (input: string): Promise<EngineResult> => {
     };
   }
 
+  if (command === "resume") {
+    return {
+      output: "Opening resume...",
+      openUrl: "/resume.pdf",
+      openInNewTab: true,
+    };
+  }
+
   if (command in COMMANDS) {
     // Temporary stubs for v0.2 phase 1:
     return { output: `${command}: command implementation in progress.` };

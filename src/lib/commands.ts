@@ -74,6 +74,13 @@ export const COMMANDS: Record<string, CommandDefinition> = {
       },
     ],
   },
+  resume: {
+    name: "resume",
+    description: "Open resume PDF in a new tab.",
+    usage: ["resume"],
+    examples: ["resume"],
+    flags: [],
+  },
   whoami: {
     name: "whoami",
     description: "Print a quick identity string.",
