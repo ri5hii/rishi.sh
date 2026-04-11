@@ -1,365 +1,377 @@
 @layer components {
-    .Boot {
-        --promptbar-gap: 1px;
-        @apply h-screen flex flex-col;
+  .Boot {
+    --promptbar-gap: 1px;
+    @apply h-screen flex flex-col;
 
-        /* Thin separator gap above prompt bar */
-        padding-bottom: var(--promptbar-gap);
+    /* Thin separator gap above prompt bar */
+    padding-bottom: var(--promptbar-gap);
+  }
+
+  /* Header */
+  .Header {
+    @apply w-full max-w-screen-2xl mx-auto px-6 pt-8 pb-4 bg-[#10141a] z-50;
+    @apply flex flex-col items-center;
+  }
+
+  .HeaderInner {
+    @apply w-full mb-8 flex justify-end;
+  }
+
+  .Button {
+    @apply inline-flex items-center gap-2;
+  }
+
+  .Button--switch {
+    @apply text-sm uppercase tracking-widest transition-opacity;
+    @apply text-[#dfe2eb]/60 hover:text-[#58a6ff] hover:opacity-80;
+    @apply font-['Space_Grotesk'];
+  }
+
+  .ButtonIndicator {
+    @apply text-sm inline-block align-middle opacity-80;
+  }
+
+  .ButtonText {
+    @apply leading-none;
+  }
+
+  /* Banner */
+  .Banner {
+    @apply w-full flex justify-center;
+  }
+
+  .BannerStack {
+    position: relative;
+    display: inline-block;
+    text-align: left;
+  }
+
+  .BannerText {
+    @apply font-mono whitespace-pre leading-none;
+    @apply text-[1.25rem] md:text-[1.5rem] lg:text-[1.75rem];
+    margin: 0;
+    color: #dfe2eb;
+    text-align: left;
+  }
+
+  .BannerText--sizer {
+    position: relative;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .BannerText--frame-base,
+  .BannerText--frame-glitchA,
+  .BannerText--frame-base2,
+  .BannerText--frame-glitchB {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .BannerText--frame-base {
+    animation: frame-base 3s infinite steps(1, end);
+  }
+
+  .BannerText--frame-glitchA {
+    animation: frame-glitch-a 3s infinite steps(1, end);
+  }
+
+  .BannerText--frame-base2 {
+    animation: frame-base2 3s infinite steps(1, end);
+  }
+
+  .BannerText--frame-glitchB {
+    animation: frame-glitch-b 3s infinite steps(1, end);
+  }
+
+  /* Gapless frame cycle: base -> glitchA -> base2 -> glitchB */
+  @keyframes frame-base {
+    0%,
+    25% {
+      opacity: 1;
     }
-
-    /* Header */
-    .Header {
-        @apply w-full max-w-screen-2xl mx-auto px-6 pt-8 pb-4 bg-[#10141a] z-50;
-        @apply flex flex-col items-center;
+    25.0001%,
+    100% {
+      opacity: 0;
     }
+  }
 
-    .HeaderInner {
-        @apply w-full mb-8 flex justify-end;
+  @keyframes frame-glitch-a {
+    0%,
+    25% {
+      opacity: 0;
     }
-
-    .Button {
-        @apply inline-flex items-center gap-2;
+    25.0001%,
+    50% {
+      opacity: 1;
     }
-
-    .Button--switch {
-        @apply text-sm uppercase tracking-widest transition-opacity;
-        @apply text-[#dfe2eb]/60 hover:text-[#58a6ff] hover:opacity-80;
-        @apply font-['Space_Grotesk'];
+    50.0001%,
+    100% {
+      opacity: 0;
     }
+  }
 
-    .ButtonIndicator {
-        @apply text-sm inline-block align-middle opacity-80;
+  @keyframes frame-base2 {
+    0%,
+    50% {
+      opacity: 0;
     }
-
-    .ButtonText {
-        @apply leading-none;
+    50.0001%,
+    75% {
+      opacity: 1;
     }
-
-    /* Banner */
-    .Banner {
-        @apply w-full flex justify-center;
+    75.0001%,
+    100% {
+      opacity: 0;
     }
+  }
 
-    .BannerStack {
-        position: relative;
-        display: inline-block;
-        text-align: left;
+  @keyframes frame-glitch-b {
+    0%,
+    75% {
+      opacity: 0;
     }
-
-    .BannerText {
-        @apply font-mono whitespace-pre leading-none;
-        @apply text-[1.25rem] md:text-[1.5rem] lg:text-[1.75rem];
-        margin: 0;
-        color: #dfe2eb;
-        text-align: left;
+    75.0001%,
+    100% {
+      opacity: 1;
     }
+  }
 
-    .BannerText--sizer {
-        position: relative;
-        visibility: hidden;
-        pointer-events: none;
+  @media (prefers-reduced-motion: reduce) {
+    .BannerText--frame-glitchA,
+    .BannerText--frame-glitchB {
+      animation: none;
+      opacity: 0;
     }
 
     .BannerText--frame-base,
-    .BannerText--frame-glitchA,
-    .BannerText--frame-base2,
-    .BannerText--frame-glitchB {
-        position: absolute;
-        inset: 0;
-        opacity: 0;
-        pointer-events: none;
-    }
-
-    .BannerText--frame-base {
-        animation: frame-base 3s infinite steps(1, end);
-    }
-
-    .BannerText--frame-glitchA {
-        animation: frame-glitch-a 3s infinite steps(1, end);
-    }
-
     .BannerText--frame-base2 {
-        animation: frame-base2 3s infinite steps(1, end);
+      animation: none;
+      opacity: 1;
     }
+  }
 
-    .BannerText--frame-glitchB {
-        animation: frame-glitch-b 3s infinite steps(1, end);
-    }
+  /* Proper layout container */
+  .Output {
+    @apply flex-1 min-h-0 flex;
+  }
 
-    /* Gapless frame cycle: base -> glitchA -> base2 -> glitchB */
-    @keyframes frame-base {
-        0%,
-        25% {
-            opacity: 1;
-        }
-        25.0001%,
-        100% {
-            opacity: 0;
-        }
-    }
+  /* Terminal defaults (full-capable) */
+  .Terminal {
+    @apply flex-1 min-h-0 w-full h-full flex items-stretch justify-stretch px-0;
+  }
 
-    @keyframes frame-glitch-a {
-        0%,
-        25% {
-            opacity: 0;
-        }
-        25.0001%,
-        50% {
-            opacity: 1;
-        }
-        50.0001%,
-        100% {
-            opacity: 0;
-        }
-    }
-
-    @keyframes frame-base2 {
-        0%,
-        50% {
-            opacity: 0;
-        }
-        50.0001%,
-        75% {
-            opacity: 1;
-        }
-        75.0001%,
-        100% {
-            opacity: 0;
-        }
-    }
-
-    @keyframes frame-glitch-b {
-        0%,
-        75% {
-            opacity: 0;
-        }
-        75.0001%,
-        100% {
-            opacity: 1;
-        }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        .BannerText--frame-glitchA,
-        .BannerText--frame-glitchB {
-            animation: none;
-            opacity: 0;
-        }
-
-        .BannerText--frame-base,
-        .BannerText--frame-base2 {
-            animation: none;
-            opacity: 1;
-        }
-    }
-
-    /* Proper layout container */
-    .Output {
-        @apply flex-1 min-h-0 flex;
-    }
-
-    /* Terminal defaults (full-capable) */
-    .Terminal {
-        @apply flex-1 min-h-0 w-full h-full flex items-stretch justify-stretch px-0;
-    }
-
-    .TerminalWindow {
-        @apply w-full max-w-none h-full min-h-0 relative overflow-hidden
+  .TerminalWindow {
+    @apply w-full max-w-none h-full min-h-0 relative overflow-hidden
          bg-[#181c22] rounded-none p-6 border-y border-[#dfe2eb]/10 border-x-0
         shadow-[0_32px_64px_-12px_rgba(162,201,255,0.05)] flex flex-col;
-    }
+  }
 
-    /* Boot mode compact card */
-    .Boot:not(.Boot--session) .Terminal {
-        @apply items-center justify-center px-6;
-    }
+  /* Boot mode compact card */
+  .Boot:not(.Boot--session) .Terminal {
+    @apply items-center justify-center px-6;
+  }
 
-    .Boot:not(.Boot--session) .TerminalWindow {
-        @apply max-w-3xl h-auto min-h-0 rounded-md border border-[#dfe2eb]/10 border-x;
-    }
+  .Boot:not(.Boot--session) .TerminalWindow {
+    @apply max-w-3xl h-auto min-h-0 rounded-md border border-[#dfe2eb]/10 border-x;
+  }
 
-    /* Session mode explicitly full-size */
-    .Boot--session .Output {
-        @apply flex-1 min-h-0;
-    }
+  /* Session mode explicitly full-size */
+  .Boot--session .Output {
+    @apply flex-1 min-h-0;
+  }
 
-    .Boot--session .Terminal {
-        @apply flex-1 min-h-0 w-full h-full items-stretch justify-stretch px-0;
-    }
+  .Boot--session .Terminal {
+    @apply flex-1 min-h-0 w-full h-full items-stretch justify-stretch px-0;
+  }
 
-    .Boot--session .TerminalWindow {
-        @apply w-full max-w-none h-full min-h-0 rounded-none border-y border-x-0 flex flex-col;
-    }
+  .Boot--session .TerminalWindow {
+    @apply w-full max-w-none h-full min-h-0 rounded-none border border-[#dfe2eb]/10 flex flex-col;
+  }
 
-    .TerminalControls {
-        @apply flex gap-2 mb-6 opacity-30;
-    }
+  .TerminalControls {
+    @apply flex gap-2 mb-6 opacity-30;
+  }
 
-    .TerminalDot {
-        @apply w-3 h-3 rounded-full;
-    }
+  .TerminalDot {
+    @apply w-3 h-3 rounded-full;
+  }
 
-    .TerminalDot--red {
-        @apply bg-[#ffb3ad];
-    }
+  .TerminalDot--red {
+    @apply bg-[#ffb3ad];
+  }
 
-    .TerminalDot--gray {
-        @apply bg-[#bec7d2];
-    }
+  .TerminalDot--gray {
+    @apply bg-[#bec7d2];
+  }
 
-    .TerminalDot--blue {
-        @apply bg-[#a2c9ff];
-    }
+  .TerminalDot--blue {
+    @apply bg-[#a2c9ff];
+  }
 
-    .TerminalBody {
-        @apply text-[#dfe2eb] font-mono flex-1 min-h-0 flex flex-col;
-    }
+  .TerminalBody {
+    @apply text-[#dfe2eb] font-mono flex-1 min-h-0 flex flex-col;
+  }
 
-    .TerminalLog {
-        @apply space-y-2 text-sm sm:text-base leading-relaxed;
-    }
+  .TerminalLog {
+    @apply space-y-2 text-sm sm:text-base leading-relaxed;
+  }
 
-    .TerminalLine.is-hidden {
-        opacity: 0;
-        transform: translateY(6px);
-    }
+  .TerminalLine.is-hidden {
+    opacity: 0;
+    transform: translateY(6px);
+  }
 
-    .TerminalLine:not(.is-hidden) {
-        animation: terminal-reveal 220ms ease-out both;
-    }
+  .TerminalLine:not(.is-hidden) {
+    animation: terminal-reveal 220ms ease-out both;
+  }
 
-    .TerminalLine {
-        @apply flex items-start gap-4;
-        opacity: 1;
-        transform: none;
-    }
+  .TerminalLine {
+    @apply flex items-start gap-4;
+    opacity: 1;
+    transform: none;
+  }
 
-    .TerminalLineNumber {
-        @apply text-[#dfe2eb]/30 select-none;
-    }
+  .TerminalLineNumber {
+    @apply text-[#dfe2eb]/30 select-none;
+  }
 
-    .TerminalText {
-        @apply text-[#dfe2eb];
-    }
+  .TerminalText {
+    @apply text-[#dfe2eb];
+  }
 
-    .TerminalTag {
-        @apply text-[#58a6ff];
-    }
+  .TerminalTag {
+    @apply text-[#58a6ff];
+  }
 
-    .TerminalLine--success .TerminalText {
-        @apply text-[#a2c9ff] font-bold;
-    }
+  .TerminalLine--success .TerminalText {
+    @apply text-[#a2c9ff] font-bold;
+  }
 
-    .TerminalLine--hint {
-        @apply pt-4;
-    }
+  .TerminalLine--hint {
+    @apply pt-4;
+  }
 
-    .TerminalLine--hint .TerminalText {
-        @apply text-[#dfe2eb]/80;
-    }
+  .TerminalLine--hint .TerminalText {
+    @apply text-[#dfe2eb]/80;
+  }
 
-    .TerminalCommand {
-        @apply text-[#58a6ff] underline decoration-dotted underline-offset-4;
-    }
+  .TerminalCommand {
+    @apply text-[#58a6ff] underline decoration-dotted underline-offset-4;
+  }
 
-    .TerminalGlow {
-        @apply absolute -bottom-12 -right-12 w-48 h-48 rounded-full blur-3xl;
-        @apply bg-[#a2c9ff]/5;
-    }
+  .TerminalGlow {
+    @apply absolute -bottom-12 -right-12 w-48 h-48 rounded-full blur-3xl;
+    @apply bg-[#a2c9ff]/5;
+  }
 
-    .TerminalLog--session {
-        @apply mt-4;
-    }
+  .TerminalLog--session {
+    @apply mt-4;
+  }
 
-    .Boot--session .TerminalLog--session {
-        @apply mt-0 flex-1 min-h-0 overflow-y-auto pr-1;
-    }
+  .Boot--session .TerminalLog--session {
+    @apply mt-0 flex-1 min-h-0 overflow-y-auto pr-1;
+  }
 
-    .SessionBlock {
-        @apply mt-4;
-    }
+  .SessionBlock {
+    @apply mt-4;
+  }
 
-    .SessionCommand {
-        @apply text-[#a2c9ff] font-mono text-sm md:text-base;
-    }
+  .SessionCommand {
+    @apply font-mono text-sm md:text-base flex items-baseline gap-2 text-left;
+  }
 
-    .SessionOutput {
-        @apply mt-2 text-[#dfe2eb] font-mono text-sm md:text-base;
-        white-space: pre-wrap;
-        margin: 0;
-    }
+  .SessionPrompt {
+    @apply text-[#a2c9ff]/75;
+  }
 
-    .SessionOutput--error {
-        @apply text-[#ffb4ab];
-    }
+  .SessionCommandText {
+    @apply text-[#ffb3ad];
+  }
 
-    /* Footer prompt bar */
-    .PromptBar {
-        @apply fixed bottom-0 left-0 w-full z-50;
-        @apply flex items-center px-6 py-6;
-        @apply bg-[#181c22] border-t border-[#dfe2eb]/10;
-        @apply shadow-[0_-4px_12px_rgba(162,201,255,0.05)];
-        border-top-width: 1px;
-    }
-    
-    .Boot--session .PromptBar {
-        @apply border-white/30;
-        border-top-width: 2px;
-    }
+  .SessionOutput {
+    @apply mt-2 text-[#dfe2eb] font-mono text-sm md:text-base;
+    white-space: pre-wrap;
+    margin: 0;
+  }
 
-    @keyframes terminal-reveal {
-        from {
-            opacity: 0;
-            transform: translateY(6px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
+  .SessionOutput--error {
+    @apply text-[#ffb4ab];
+  }
 
-    .PromptBarInner {
-        @apply max-w-screen-2xl mx-auto w-full min-w-0 flex items-center;
-    }
+  /* Footer prompt bar */
+  .PromptBar {
+    @apply fixed bottom-0 left-0 w-full z-50;
+    @apply flex items-center px-6 py-6;
+    @apply bg-[#181c22] border-t border-[#dfe2eb]/10;
+    @apply shadow-[0_-4px_12px_rgba(162,201,255,0.05)];
+    border-top-width: 1px;
+  }
 
-    .Prompt {
-        @apply w-full min-w-0 flex items-center font-mono;
-        @apply text-sm md:text-base;
-    }
+  .Boot--session .PromptBar {
+    @apply border-t border-[#dfe2eb]/10;
+    border-top-width: 1px;
+  }
 
-    .PromptPrefix {
-        @apply inline-flex items-center gap-2;
-    }
+  .Boot--session .PromptBarInner {
+    @apply max-w-none mx-0;
+  }
 
-    .PromptHost {
-        @apply text-[#58a6ff];
+  @keyframes terminal-reveal {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
     }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 
-    .PromptDim {
-        @apply text-[#dfe2eb]/40;
-    }
+  .PromptBarInner {
+    @apply max-w-screen-2xl mx-auto w-full min-w-0 flex items-center;
+  }
 
-    .PromptCwd {
-        @apply text-[#a2c9ff];
-    }
+  .Prompt {
+    @apply w-full min-w-0 flex items-center font-mono;
+    @apply text-sm md:text-base;
+  }
 
-    .PromptInput {
-        @apply bg-transparent outline-none border-0 text-[#dfe2eb] font-mono;
-        @apply text-sm md:text-base;
-        flex: 1;
-        min-width: 0;
-        width: 100%;
-        caret-color: #a2c9ff;
-        margin-left: 1ch;
-    }
+  .PromptPrefix {
+    @apply inline-flex items-center gap-2;
+  }
 
-    .PromptInput:disabled {
-        opacity: 0.35;
-    }
+  .PromptHost {
+    @apply text-[#58a6ff];
+  }
 
-    .CursorBlink {
-        @apply inline-block align-middle ml-1;
-        @apply w-[10px] h-[1.2em];
-        @apply bg-[#a2c9ff];
-    }
+  .PromptDim {
+    @apply text-[#dfe2eb]/40;
+  }
+
+  .PromptCwd {
+    @apply text-[#a2c9ff];
+  }
+
+  .PromptInput {
+    @apply bg-transparent outline-none border-0 text-[#dfe2eb] font-mono;
+    @apply text-sm md:text-base;
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+    caret-color: #a2c9ff;
+    margin-left: 1ch;
+  }
+
+  .PromptInput:disabled {
+    opacity: 0.35;
+  }
+
+  .CursorBlink {
+    @apply inline-block align-middle ml-1;
+    @apply w-[10px] h-[1.2em];
+    @apply bg-[#a2c9ff];
+  }
 }
