@@ -13,8 +13,21 @@
     @apply flex flex-col items-center;
   }
 
+  .Boot--session .Header {
+    @apply pt-2 pb-1;
+  }
+
   .HeaderInner {
     @apply w-full mb-8 flex justify-end;
+  }
+
+  .Boot--session .HeaderInner {
+    @apply mb-1;
+  }
+
+  .Boot--session .Button--switch {
+    @apply text-xs;
+    letter-spacing: 0.14em;
   }
 
   .Button {
@@ -52,6 +65,10 @@
     margin: 0;
     color: #dfe2eb;
     text-align: left;
+  }
+
+  .Boot--session .BannerText {
+    @apply text-[0.55rem] md:text-[0.72rem] lg:text-[0.86rem];
   }
 
   .BannerText--sizer {
@@ -181,6 +198,11 @@
   /* Session mode explicitly full-size */
   .Boot--session .Output {
     @apply flex-1 min-h-0;
+    box-sizing: border-box;
+    padding-top: 1%;
+    padding-right: 1%;
+    padding-bottom: 5%;
+    padding-left: 1%;
   }
 
   .Boot--session .Terminal {
@@ -386,8 +408,14 @@
   }
 
   .Boot--session .PromptBar {
-    @apply border-t border-[#dfe2eb]/10;
+    @apply border border-[#dfe2eb]/10;
     border-top-width: 1px;
+    left: 1%;
+    right: auto;
+    width: calc(100% - 2%);
+    border-radius: 0.25rem 0.25rem 0 0;
+    padding-left: 0;
+    padding-right: 0;
   }
 
   .Boot--session .PromptBarInner {
