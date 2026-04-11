@@ -1,4 +1,5 @@
 import { fetchAboutRenderedHtml } from "./about";
+import { fetchBlogIndexHtml, fetchBlogPostHtml } from "./blog";
 import { COMMANDS } from "./commands";
 import { renderHelpCommand, renderHelpIndex } from "./help";
 import { fetchProjectReadmeHtml, fetchProjectsIndexHtml } from "./projects";
@@ -70,6 +71,29 @@ export const executeCommand = async (input: string): Promise<EngineResult> => {
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       return { output: `projects: ${message}`, error: true };
+    }
+  }
+
+  if (command === "blog") {
+    const postArg = args.find((arg) => !arg.startsWith("-"));
+
+    try {
+      if (!postArg) {
+        const html = await fetchBlogIndexHtml();
+        return {
+          output: html,
+          outputMode: "html",
+        };
+      }
+
+      const html = await fetchBlogPostHtml(postArg);
+      return {
+        output: html,
+        outputMode: "html",
+      };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      return { output: `blog: ${message}`, error: true };
     }
   }
 
