@@ -46,6 +46,13 @@ export const executeCommand = async (input: string): Promise<EngineResult> => {
     }
   }
 
+  if (command === "whoami") {
+    return {
+      output:
+        "Hrishikesh Vadla\nAI/ML + cybersecurity builder focused on secure intelligent systems.",
+    };
+  }
+
   if (command in COMMANDS) {
     // Temporary stubs for v0.2 phase 1:
     return { output: `${command}: command implementation in progress.` };
