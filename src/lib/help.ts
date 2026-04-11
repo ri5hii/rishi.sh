@@ -15,6 +15,9 @@ const renderFlags = (flags: CommandDefinition["flags"]) => {
   return ["Flags:", ...rows].join("\n");
 };
 
+const renderShortcuts = () =>
+  ["Shortcuts:", "  Ctrl+I (Cmd+I)  Focus prompt input"].join("\n");
+
 export const renderHelpIndex = () => {
   const nameCol = Math.max(...COMMAND_NAMES.map((n) => n.length), 7);
   const lines = [
@@ -22,9 +25,11 @@ export const renderHelpIndex = () => {
     "",
     `${pad("COMMAND", nameCol)}  DESCRIPTION`,
     `${"-".repeat(nameCol)}  ${"-".repeat(42)}`,
-    ...COMMAND_NAMES.map((name) =>
-      `${pad(name, nameCol)}  ${COMMANDS[name].description}`
+    ...COMMAND_NAMES.map(
+      (name) => `${pad(name, nameCol)}  ${COMMANDS[name].description}`,
     ),
+    "",
+    renderShortcuts(),
     "",
     "Run `help <command>` for detailed usage.",
   ];
@@ -50,6 +55,10 @@ export const renderHelpCommand = (commandName: string) => {
     "Examples:",
     ...cmd.examples.map((e) => `  ${e}`),
   ];
+
+  if (cmd.name === "help") {
+    sections.push("", renderShortcuts());
+  }
 
   return sections.join("\n");
 };

@@ -85,6 +85,35 @@
           "prompt-input",
         ) as HTMLInputElement | null;
 
+        const isEditableTarget = (target: EventTarget | null) => {
+          if (!(target instanceof HTMLElement)) return false;
+          if (target.isContentEditable) return true;
+
+          const tag = target.tagName;
+          return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
+        };
+
+        const focusPromptInput = () => {
+          if (!promptInput || promptInput.disabled) return;
+          promptInput.focus();
+          promptInput.setSelectionRange(
+            promptInput.value.length,
+            promptInput.value.length,
+          );
+        };
+
+        document.addEventListener("keydown", (event: KeyboardEvent) => {
+          if (event.defaultPrevented || event.repeat) return;
+
+          const isFocusShortcut =
+            (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "i";
+
+          if (!isFocusShortcut || isEditableTarget(event.target)) return;
+
+          event.preventDefault();
+          focusPromptInput();
+        });
+
         const sanitizeHtml = (unsafeHtml: string): string => {
           const template = document.createElement("template");
           template.innerHTML = unsafeHtml;
@@ -345,7 +374,7 @@
             );
             if (promptInput) {
               promptInput.disabled = false;
-              promptInput.focus();
+              focusPromptInput();
               initPromptSession(promptInput, null);
             }
             return;
@@ -357,7 +386,7 @@
 
           if (promptInput) {
             promptInput.disabled = false;
-            promptInput.focus();
+            focusPromptInput();
             initPromptSession(promptInput, log);
           }
         })();
