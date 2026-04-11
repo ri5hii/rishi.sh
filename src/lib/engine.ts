@@ -22,22 +22,205 @@ const parseInput = (input: string) => {
   return { command, args };
 };
 
+type ParsedArgs = {
+  positionals: string[];
+  flags: Set<string>;
+};
+
+const commandError = (commandName: string, message: string): EngineResult => ({
+  output: `${commandName}: ${message}\nRun \`help ${commandName}\` for usage.`,
+  error: true,
+});
+
+const parseCommandArgs = (
+  commandName: string,
+  args: string[],
+): ParsedArgs | EngineResult => {
+  const definition = COMMANDS[commandName];
+  if (!definition) {
+    return { positionals: [...args], flags: new Set<string>() };
+  }
+
+  const aliasToLong = new Map<string, { long: string; expectsValue?: boolean }>();
+  for (const flag of definition.flags) {
+    aliasToLong.set(flag.long, {
+      long: flag.long,
+      expectsValue: flag.expectsValue,
+    });
+    if (flag.short) {
+      aliasToLong.set(flag.short, {
+        long: flag.long,
+        expectsValue: flag.expectsValue,
+      });
+    }
+  }
+
+  const supportedFlags = definition.flags
+    .flatMap((flag) => [flag.long, flag.short].filter(Boolean))
+    .join(", ");
+
+  const unknownFlagError = (flagToken: string) => {
+    if (!supportedFlags) {
+      return commandError(
+        commandName,
+        `Unknown flag: ${flagToken}. This command does not accept flags.`,
+      );
+    }
+
+    return commandError(
+      commandName,
+      `Unknown flag: ${flagToken}. Supported flags: ${supportedFlags}`,
+    );
+  };
+
+  const positionals: string[] = [];
+  const flags = new Set<string>();
+
+  const applyFlagToken = (
+    flagToken: string,
+    inlineValue: string | undefined,
+    index: number,
+  ): { consumeNext: boolean; error?: EngineResult } => {
+    const resolved = aliasToLong.get(flagToken);
+    if (!resolved) {
+      return { consumeNext: false, error: unknownFlagError(flagToken) };
+    }
+
+    if (resolved.expectsValue) {
+      if (inlineValue !== undefined && !inlineValue.trim()) {
+        return {
+          consumeNext: false,
+          error: commandError(commandName, `Flag ${flagToken} requires a value.`),
+        };
+      }
+
+      if (inlineValue === undefined) {
+        const next = args[index + 1];
+        if (next === undefined) {
+          return {
+            consumeNext: false,
+            error: commandError(
+              commandName,
+              `Flag ${flagToken} requires a value.`,
+            ),
+          };
+        }
+        return { consumeNext: true };
+      }
+
+      return { consumeNext: false };
+    }
+
+    if (inlineValue !== undefined) {
+      return {
+        consumeNext: false,
+        error: commandError(
+          commandName,
+          `Flag ${flagToken} does not accept a value.`,
+        ),
+      };
+    }
+
+    flags.add(resolved.long);
+    return { consumeNext: false };
+  };
+
+  for (let i = 0; i < args.length; i++) {
+    const token = args[i];
+
+    if (token === "--") {
+      positionals.push(...args.slice(i + 1));
+      break;
+    }
+
+    if (!token.startsWith("-") || token === "-") {
+      positionals.push(token);
+      continue;
+    }
+
+    if (token.startsWith("--")) {
+      const eqIndex = token.indexOf("=");
+      const flagToken = eqIndex >= 0 ? token.slice(0, eqIndex) : token;
+      const inlineValue = eqIndex >= 0 ? token.slice(eqIndex + 1) : undefined;
+      const outcome = applyFlagToken(flagToken, inlineValue, i);
+      if (outcome.error) return outcome.error;
+      if (outcome.consumeNext) i++;
+      continue;
+    }
+
+    if (token.length > 2) {
+      const shortFlags = token.slice(1).split("");
+      let consumedNext = false;
+
+      for (let j = 0; j < shortFlags.length; j++) {
+        const shortToken = `-${shortFlags[j]}`;
+        const resolved = aliasToLong.get(shortToken);
+
+        if (!resolved) {
+          return unknownFlagError(shortToken);
+        }
+
+        if (resolved.expectsValue) {
+          const trailingValue = token.slice(j + 2);
+          const inlineValue = trailingValue.length ? trailingValue : undefined;
+          const outcome = applyFlagToken(shortToken, inlineValue, i);
+          if (outcome.error) return outcome.error;
+          if (outcome.consumeNext) consumedNext = true;
+          break;
+        }
+
+        const outcome = applyFlagToken(shortToken, undefined, i);
+        if (outcome.error) return outcome.error;
+      }
+
+      if (consumedNext) i++;
+      continue;
+    }
+
+    const outcome = applyFlagToken(token, undefined, i);
+    if (outcome.error) return outcome.error;
+    if (outcome.consumeNext) i++;
+  }
+
+  return { positionals, flags };
+};
+
 export const executeCommand = async (input: string): Promise<EngineResult> => {
   const trimmed = input.trim();
   if (!trimmed) return { output: "" };
 
-  const { command, args } = parseInput(trimmed);
+  const { command: rawCommand, args } = parseInput(trimmed);
+  const command = rawCommand.toLowerCase();
 
   if (command === "help") {
-    if (!args.length) return { output: renderHelpIndex() };
-    return { output: renderHelpCommand(args[0].toLowerCase()) };
+    const parsed = parseCommandArgs(command, args);
+    if ("error" in parsed) return parsed;
+
+    if (!parsed.positionals.length) return { output: renderHelpIndex() };
+
+    if (parsed.positionals.length > 1) {
+      return commandError(command, "Expected at most one command name.");
+    }
+
+    return { output: renderHelpCommand(parsed.positionals[0].toLowerCase()) };
   }
 
   if (command === "cls") {
+    const parsed = parseCommandArgs(command, args);
+    if ("error" in parsed) return parsed;
+    if (parsed.positionals.length) {
+      return commandError(command, "This command does not accept arguments.");
+    }
     return { output: "", clear: true };
   }
 
   if (command === "about") {
+    const parsed = parseCommandArgs(command, args);
+    if ("error" in parsed) return parsed;
+    if (parsed.positionals.length) {
+      return commandError(command, "This command does not accept arguments.");
+    }
+
     try {
       const html = await fetchAboutRenderedHtml();
       return {
@@ -51,8 +234,18 @@ export const executeCommand = async (input: string): Promise<EngineResult> => {
   }
 
   if (command === "projects") {
-    const includeAll = args.includes("--all") || args.includes("-a");
-    const repoArg = args.find((arg) => !arg.startsWith("-"));
+    const parsed = parseCommandArgs(command, args);
+    if ("error" in parsed) return parsed;
+
+    const includeAll = parsed.flags.has("--all");
+    if (parsed.positionals.length > 1) {
+      return commandError(
+        command,
+        "Expected at most one repository name argument.",
+      );
+    }
+
+    const repoArg = parsed.positionals[0];
 
     try {
       if (!repoArg) {
@@ -75,7 +268,14 @@ export const executeCommand = async (input: string): Promise<EngineResult> => {
   }
 
   if (command === "blog") {
-    const postArg = args.find((arg) => !arg.startsWith("-"));
+    const parsed = parseCommandArgs(command, args);
+    if ("error" in parsed) return parsed;
+
+    if (parsed.positionals.length > 1) {
+      return commandError(command, "Expected at most one post id/slug.");
+    }
+
+    const postArg = parsed.positionals[0];
 
     try {
       if (!postArg) {
@@ -98,6 +298,12 @@ export const executeCommand = async (input: string): Promise<EngineResult> => {
   }
 
   if (command === "whoami") {
+    const parsed = parseCommandArgs(command, args);
+    if ("error" in parsed) return parsed;
+    if (parsed.positionals.length) {
+      return commandError(command, "This command does not accept arguments.");
+    }
+
     return {
       output:
         "Hrishikesh Vadla\nAI/ML + cybersecurity builder focused on secure intelligent systems.",
@@ -105,7 +311,14 @@ export const executeCommand = async (input: string): Promise<EngineResult> => {
   }
 
   if (command === "neofetch") {
-    const compact = args.includes("--compact") || args.includes("-c");
+    const parsed = parseCommandArgs(command, args);
+    if ("error" in parsed) return parsed;
+
+    if (parsed.positionals.length) {
+      return commandError(command, "This command does not accept arguments.");
+    }
+
+    const compact = parsed.flags.has("--compact");
 
     if (compact) {
       return {
@@ -146,9 +359,27 @@ export const executeCommand = async (input: string): Promise<EngineResult> => {
   }
 
   if (command === "contact") {
-    const openGitHub = args.includes("--github") || args.includes("-g");
-    const openLinkedIn = args.includes("--linkedin") || args.includes("-l");
-    const openEmail = args.includes("--email") || args.includes("-e");
+    const parsed = parseCommandArgs(command, args);
+    if ("error" in parsed) return parsed;
+
+    if (parsed.positionals.length) {
+      return commandError(command, "This command does not accept arguments.");
+    }
+
+    const openGitHub = parsed.flags.has("--github");
+    const openLinkedIn = parsed.flags.has("--linkedin");
+    const openEmail = parsed.flags.has("--email");
+
+    const selectedDestinations = [openGitHub, openLinkedIn, openEmail].filter(
+      Boolean,
+    ).length;
+
+    if (selectedDestinations > 1) {
+      return commandError(
+        command,
+        "Use only one destination flag at a time.",
+      );
+    }
 
     if (openGitHub || openLinkedIn || openEmail) {
       if (openGitHub) {
@@ -189,6 +420,12 @@ export const executeCommand = async (input: string): Promise<EngineResult> => {
   }
 
   if (command === "resume") {
+    const parsed = parseCommandArgs(command, args);
+    if ("error" in parsed) return parsed;
+    if (parsed.positionals.length) {
+      return commandError(command, "This command does not accept arguments.");
+    }
+
     return {
       output: "Opening resume...",
       openUrl: "/resume.pdf",
