@@ -1,0 +1,389 @@
+<section class="Terminal">
+  <div class="TerminalWindow">
+    <!-- Window Controls -->
+    <div class="TerminalControls">
+      <span class="TerminalDot TerminalDot--red"></span>
+      <span class="TerminalDot TerminalDot--gray"></span>
+      <span class="TerminalDot TerminalDot--blue"></span>
+    </div>
+
+    <!-- Terminal Content -->
+    <div class="TerminalBody">
+      <div class="TerminalLog" id="boot-log">
+        <div
+          class="TerminalLine"
+          data-line="01"
+          data-tag="[INFO]"
+          data-text="rishi.sh..."
+        >
+          <span class="TerminalLineNumber">01</span>
+          <p class="TerminalText">
+            <span class="TerminalTag"></span>
+            <span class="TerminalTyped"></span>
+          </p>
+        </div>
+
+        <div
+          class="TerminalLine"
+          data-line="02"
+          data-tag="[SYS]"
+          data-text="initializing modules..."
+        >
+          <span class="TerminalLineNumber">02</span>
+          <p class="TerminalText">
+            <span class="TerminalTag"></span>
+            <span class="TerminalTyped"></span>
+          </p>
+        </div>
+
+        <div
+          class="TerminalLine"
+          data-line="03"
+          data-tag="[FS]"
+          data-text="loading projects..."
+        >
+          <span class="TerminalLineNumber">03</span>
+          <p class="TerminalText">
+            <span class="TerminalTag"></span>
+            <span class="TerminalTyped"></span>
+          </p>
+        </div>
+
+        <div
+          class="TerminalLine TerminalLine--success"
+          data-line="04"
+          data-tag=""
+          data-text="READY."
+        >
+          <span class="TerminalLineNumber">04</span>
+          <p class="TerminalText">
+            <span class="TerminalTyped"></span>
+          </p>
+        </div>
+
+        <div
+          class="TerminalLine TerminalLine--hint"
+          data-line="05"
+          data-tag=""
+          data-text="Type 'help' to begin."
+        >
+          <span class="TerminalLineNumber">05</span>
+          <p class="TerminalText">
+            <span class="TerminalTyped"></span>
+          </p>
+        </div>
+      </div>
+
+      <div id="session-log" class="TerminalLog TerminalLog--session"></div>
+
+      <script>
+        import { executeCommand } from "../lib/engine";
+
+        const log = document.getElementById("boot-log");
+        const sessionLog = document.getElementById("session-log");
+        const promptInput = document.getElementById(
+          "prompt-input",
+        ) as HTMLInputElement | null;
+
+        const sanitizeHtml = (unsafeHtml: string): string => {
+          const template = document.createElement("template");
+          template.innerHTML = unsafeHtml;
+
+          const allowedTags = new Set([
+            "a",
+            "blockquote",
+            "br",
+            "code",
+            "details",
+            "div",
+            "em",
+            "h1",
+            "h2",
+            "h3",
+            "h4",
+            "h5",
+            "h6",
+            "hr",
+            "img",
+            "li",
+            "ol",
+            "p",
+            "pre",
+            "span",
+            "strong",
+            "summary",
+            "table",
+            "tbody",
+            "td",
+            "th",
+            "thead",
+            "tr",
+            "ul",
+          ]);
+
+          const allowedAttributes: Record<string, Set<string>> = {
+            "*": new Set(["class", "align"]),
+            a: new Set(["href", "title", "target", "rel"]),
+            img: new Set(["src", "alt", "title", "width", "height"]),
+            details: new Set(["open"]),
+          };
+
+          const isSafeUrl = (url: string) => {
+            const trimmed = url.trim();
+            if (!trimmed) return false;
+            return (
+              trimmed.startsWith("https://") ||
+              trimmed.startsWith("http://") ||
+              trimmed.startsWith("mailto:")
+            );
+          };
+
+          const elements = template.content.querySelectorAll("*");
+          for (const element of elements) {
+            const tag = element.tagName.toLowerCase();
+
+            if (!allowedTags.has(tag)) {
+              element.replaceWith(...Array.from(element.childNodes));
+              continue;
+            }
+
+            const globalAllowed = allowedAttributes["*"];
+            const tagAllowed = allowedAttributes[tag] ?? new Set<string>();
+
+            for (const attr of Array.from(element.attributes)) {
+              const attrName = attr.name.toLowerCase();
+              const allowed =
+                globalAllowed.has(attrName) || tagAllowed.has(attrName);
+
+              if (!allowed) {
+                element.removeAttribute(attr.name);
+                continue;
+              }
+
+              if (
+                (attrName === "href" || attrName === "src") &&
+                !isSafeUrl(attr.value)
+              ) {
+                element.removeAttribute(attr.name);
+              }
+            }
+
+            if (tag === "a") {
+              element.setAttribute("target", "_blank");
+              element.setAttribute("rel", "noopener noreferrer");
+            }
+          }
+
+          return template.innerHTML;
+        };
+
+        const appendBlock = (
+          command: string,
+          output: string,
+          outputMode: "text" | "html" = "text",
+          isError = false,
+        ) => {
+          if (!sessionLog) return;
+
+          const block = document.createElement("div");
+          block.className = "SessionBlock";
+
+          const commandLine = document.createElement("div");
+          commandLine.className = "SessionCommand";
+
+          const promptSpan = document.createElement("span");
+          promptSpan.className = "SessionPrompt";
+          promptSpan.textContent = "rishi@rishi.sh:~$";
+
+          const commandSpan = document.createElement("span");
+          commandSpan.className = "SessionCommandText";
+          commandSpan.textContent = command;
+
+          commandLine.appendChild(promptSpan);
+          commandLine.appendChild(commandSpan);
+
+          let outputNode: HTMLElement;
+
+          if (outputMode === "html") {
+            const outputRich = document.createElement("div");
+            outputRich.className = isError
+              ? "SessionOutput SessionOutputRich SessionOutput--error"
+              : "SessionOutput SessionOutputRich";
+            outputRich.innerHTML = sanitizeHtml(output);
+            outputNode = outputRich;
+          } else {
+            const outputPre = document.createElement("pre");
+            outputPre.className = isError
+              ? "SessionOutput SessionOutput--error"
+              : "SessionOutput";
+            outputPre.textContent = output;
+            outputNode = outputPre;
+          }
+
+          block.appendChild(commandLine);
+          block.appendChild(outputNode);
+          sessionLog.appendChild(block);
+
+          const targetTop =
+            outputNode.getBoundingClientRect().top -
+            sessionLog.getBoundingClientRect().top +
+            sessionLog.scrollTop;
+          sessionLog.scrollTo({ top: targetTop, behavior: "auto" });
+        };
+
+        const clearSession = () => {
+          if (sessionLog) sessionLog.innerHTML = "";
+        };
+
+        const runBootSequence = async (bootLogEl: HTMLElement | null) => {
+          if (!bootLogEl) return;
+
+          const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+          const BASE_CHAR_DELAY = 18;
+          const JITTER = 26;
+          const LINE_PAUSE_MIN = 120;
+          const LINE_PAUSE_JITTER = 240;
+
+          const allLines = Array.from(
+            bootLogEl.querySelectorAll(".TerminalLine"),
+          );
+
+          const randInt = (min: number, max: number) =>
+            Math.floor(Math.random() * (max - min + 1)) + min;
+
+          const typeLine = async (lineEl: Element) => {
+            const tagEl = lineEl.querySelector(".TerminalTag");
+            const typedEl = lineEl.querySelector(".TerminalTyped");
+            if (!typedEl) return;
+
+            const tag = lineEl.getAttribute("data-tag") || "";
+            const text = lineEl.getAttribute("data-text") || "";
+
+            if (tagEl) {
+              tagEl.textContent = tag ? tag + " " : "";
+            }
+
+            typedEl.textContent = "";
+
+            for (let i = 0; i < text.length; i++) {
+              typedEl.textContent += text[i];
+
+              const isPunctuation = /[.,:;!?]/.test(text[i]);
+              const stall = isPunctuation ? randInt(40, 140) : 0;
+
+              const delay = Math.max(
+                0,
+                BASE_CHAR_DELAY + randInt(-JITTER, JITTER) + stall,
+              );
+
+              await sleep(delay);
+            }
+
+            await sleep(LINE_PAUSE_MIN + randInt(0, LINE_PAUSE_JITTER));
+          };
+
+          for (const line of allLines) {
+            await typeLine(line);
+          }
+        };
+
+        const initPromptSession = (
+          inputEl: HTMLInputElement | null,
+          bootLogEl: HTMLElement | null,
+        ) => {
+          if (!inputEl) return;
+
+          let hasEnteredSessionMode = false;
+          const bootRoot = document.querySelector(".Boot");
+
+          inputEl.addEventListener("keydown", async (e: KeyboardEvent) => {
+            if (e.key !== "Enter") return;
+            e.preventDefault();
+
+            const raw = inputEl.value.trim();
+            if (!raw) return;
+
+            if (!hasEnteredSessionMode) {
+              hasEnteredSessionMode = true;
+              if (bootLogEl) bootLogEl.style.display = "none";
+              if (bootRoot) bootRoot.classList.add("Boot--session");
+            }
+
+            try {
+              const result = await executeCommand(raw);
+
+              if (result.clear) {
+                clearSession();
+              } else {
+                appendBlock(
+                  raw,
+                  result.output,
+                  result.outputMode ?? "text",
+                  Boolean(result.error),
+                );
+              }
+
+              if (result.openUrl) {
+                const target = result.openInNewTab ? "_blank" : "_self";
+                window.open(result.openUrl, target, "noopener,noreferrer");
+              }
+            } catch (error) {
+              const message =
+                error instanceof Error ? error.message : String(error);
+              appendBlock(raw, `Runtime error: ${message}`, "text", true);
+            } finally {
+              inputEl.value = "";
+            }
+          });
+        };
+
+        (async () => {
+          if (!log) {
+            console.warn(
+              "[boot] #boot-log not found; skipping boot typing animation.",
+            );
+            if (promptInput) {
+              promptInput.disabled = false;
+              promptInput.focus();
+              initPromptSession(promptInput, null);
+            }
+            return;
+          }
+
+          if (promptInput) promptInput.disabled = true;
+
+          await runBootSequence(log);
+
+          if (promptInput) {
+            promptInput.disabled = false;
+            promptInput.focus();
+            initPromptSession(promptInput, log);
+          }
+        })();
+      </script>
+
+      <footer class="PromptBar">
+        <div class="PromptBarInner">
+          <div class="Prompt">
+            <span class="PromptPrefix">
+              <span class="PromptHost">rishi@rishi.sh</span>
+              <span class="PromptDim">:</span>
+              <span class="PromptCwd">~</span>
+              <span class="PromptDim">$</span>
+            </span>
+            <input
+              id="prompt-input"
+              class="PromptInput"
+              type="text"
+              autocomplete="off"
+              autocapitalize="off"
+              spellcheck="false"
+              disabled
+            />
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+</section>
