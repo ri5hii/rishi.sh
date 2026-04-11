@@ -1,10 +1,10 @@
 @layer components {
     .Boot {
-        --promptbar-h: 96px;
+        --promptbar-gap: 1px;
         @apply h-screen flex flex-col;
 
-        /* Reserve space for fixed PromptBar */
-        padding-bottom: var(--promptbar-h);
+        /* Thin separator gap above prompt bar */
+        padding-bottom: var(--promptbar-gap);
     }
 
     /* Header */
@@ -153,20 +153,42 @@
         }
     }
 
-    /* ✅ FIXED: Proper layout container */
+    /* Proper layout container */
     .Output {
         @apply flex-1 min-h-0 flex;
     }
 
-    /* Terminal card */
+    /* Terminal defaults (full-capable) */
     .Terminal {
-        @apply flex-1 flex items-center justify-center px-6;
+        @apply flex-1 min-h-0 w-full h-full flex items-stretch justify-stretch px-0;
     }
 
     .TerminalWindow {
-        @apply w-full max-w-3xl relative overflow-hidden
-         bg-[#181c22] rounded-md p-6 border border-[#dfe2eb]/10
-        shadow-[0_32px_64px_-12px_rgba(162,201,255,0.05)];
+        @apply w-full max-w-none h-full min-h-0 relative overflow-hidden
+         bg-[#181c22] rounded-none p-6 border-y border-[#dfe2eb]/10 border-x-0
+        shadow-[0_32px_64px_-12px_rgba(162,201,255,0.05)] flex flex-col;
+    }
+
+    /* Boot mode compact card */
+    .Boot:not(.Boot--session) .Terminal {
+        @apply items-center justify-center px-6;
+    }
+
+    .Boot:not(.Boot--session) .TerminalWindow {
+        @apply max-w-3xl h-auto min-h-0 rounded-md border border-[#dfe2eb]/10 border-x;
+    }
+
+    /* Session mode explicitly full-size */
+    .Boot--session .Output {
+        @apply flex-1 min-h-0;
+    }
+
+    .Boot--session .Terminal {
+        @apply flex-1 min-h-0 w-full h-full items-stretch justify-stretch px-0;
+    }
+
+    .Boot--session .TerminalWindow {
+        @apply w-full max-w-none h-full min-h-0 rounded-none border-y border-x-0 flex flex-col;
     }
 
     .TerminalControls {
@@ -190,7 +212,7 @@
     }
 
     .TerminalBody {
-        @apply text-[#dfe2eb] font-mono;
+        @apply text-[#dfe2eb] font-mono flex-1 min-h-0 flex flex-col;
     }
 
     .TerminalLog {
@@ -245,12 +267,44 @@
         @apply bg-[#a2c9ff]/5;
     }
 
+    .TerminalLog--session {
+        @apply mt-4;
+    }
+
+    .Boot--session .TerminalLog--session {
+        @apply mt-0 flex-1 min-h-0 overflow-y-auto pr-1;
+    }
+
+    .SessionBlock {
+        @apply mt-4;
+    }
+
+    .SessionCommand {
+        @apply text-[#a2c9ff] font-mono text-sm md:text-base;
+    }
+
+    .SessionOutput {
+        @apply mt-2 text-[#dfe2eb] font-mono text-sm md:text-base;
+        white-space: pre-wrap;
+        margin: 0;
+    }
+
+    .SessionOutput--error {
+        @apply text-[#ffb4ab];
+    }
+
     /* Footer prompt bar */
     .PromptBar {
         @apply fixed bottom-0 left-0 w-full z-50;
         @apply flex items-center px-6 py-6;
         @apply bg-[#181c22] border-t border-[#dfe2eb]/10;
         @apply shadow-[0_-4px_12px_rgba(162,201,255,0.05)];
+        border-top-width: 1px;
+    }
+    
+    .Boot--session .PromptBar {
+        @apply border-white/30;
+        border-top-width: 2px;
     }
 
     @keyframes terminal-reveal {

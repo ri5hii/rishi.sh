@@ -1,18 +1,19 @@
+---
+import { executeCommand } from "../lib/engine";
+---
+
 <div class="Boot">
     <!-- Header -->
     <header class="Header">
         <div class="HeaderInner">
             <button class="Button Button--switch">
-                <span class="material-symbols-outlined ButtonIndicator"
-                    >settings_input_component</span
-                >
+                <span class="material-symbols-outlined ButtonIndicator">settings_input_component</span>
                 <span class="ButtonText">Switch UI</span>
             </button>
         </div>
         <div class="Banner">
             <div class="BannerStack" aria-hidden="true">
-                <pre
-                    class="BannerText BannerText--sizer">
+                <pre class="BannerText BannerText--sizer">
 ██████╗ ██╗███████╗██╗  ██╗██╗      ███████╗██╗  ██╗
 ██╔══██╗██║██╔════╝██║  ██║██║      ██╔════╝██║  ██║
 ██████╔╝██║███████╗███████║██║      ███████╗███████║
@@ -20,8 +21,7 @@
 ██║  ██║██║███████║██║  ██║██║  ██╗ ███████║██║  ██║
 ╚═╝  ╚═╝╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚══════╝╚═╝  ╚═╝
                 </pre>
-                <pre
-                    class="BannerText BannerText--frame-base">
+                <pre class="BannerText BannerText--frame-base">
 ██████╗ ██╗███████╗██╗  ██╗██╗      ███████╗██╗  ██╗
 ██╔══██╗██║██╔════╝██║  ██║██║      ██╔════╝██║  ██║
 ██████╔╝██║███████╗███████║██║      ███████╗███████║
@@ -29,8 +29,7 @@
 ██║  ██║██║███████║██║  ██║██║  ██╗ ███████║██║  ██║
 ╚═╝  ╚═╝╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚══════╝╚═╝  ╚═╝
                 </pre>
-                <pre
-                    class="BannerText BannerText--frame-glitchA">
+                <pre class="BannerText BannerText--frame-glitchA">
 ██████╗ ██╗███████╗██╗  ██╗██╗      ███████╗██╗  ██╗
   ██╔══██╗██║██╔════╝██║  ██║██║      ██╔════╝██║  ██║
 ██████╔╝██║███████╗███████║██║      ███████╗███████║
@@ -38,8 +37,7 @@
  ██║  ██║██║███████║██║  ██║██║  ██╗ ███████║██║  ██║
 ╚═╝  ╚═╝╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚══════╝╚═╝  ╚═╝
                 </pre>
-                <pre
-                    class="BannerText BannerText--frame-base2">
+                <pre class="BannerText BannerText--frame-base2">
 ██████╗ ██╗███████╗██╗  ██╗██╗      ███████╗██╗  ██╗
 ██╔══██╗██║██╔════╝██║  ██║██║      ██╔════╝██║  ██║
 ██████╔╝██║███████╗███████║██║      ███████╗███████║
@@ -47,8 +45,7 @@
 ██║  ██║██║███████║██║  ██║██║  ██╗ ███████║██║  ██║
 ╚═╝  ╚═╝╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚══════╝╚═╝  ╚═╝
                 </pre>
-                <pre
-                    class="BannerText BannerText--frame-glitchB">
+                <pre class="BannerText BannerText--frame-glitchB">
 ██████╗ ██╗███████╗██╗  ██╗██╗      ███████╗██╗  ██╗
 ██╔══██╗██║██╔════╝██║  ██║██║      ██╔════╝██║  ██║
  ██████╔╝██║███████╗███████║██║      ███████╗███████║
@@ -74,12 +71,7 @@
                 <!-- Terminal Content -->
                 <div class="TerminalBody">
                     <div class="TerminalLog" id="boot-log">
-                        <div
-                            class="TerminalLine"
-                            data-line="01"
-                            data-tag="[INFO]"
-                            data-text="booting rishi.sh..."
-                        >
+                        <div class="TerminalLine" data-line="01" data-tag="[INFO]" data-text="rishi.sh...">
                             <span class="TerminalLineNumber">01</span>
                             <p class="TerminalText">
                                 <span class="TerminalTag"></span>
@@ -87,12 +79,7 @@
                             </p>
                         </div>
 
-                        <div
-                            class="TerminalLine"
-                            data-line="02"
-                            data-tag="[SYS]"
-                            data-text="initializing modules..."
-                        >
+                        <div class="TerminalLine" data-line="02" data-tag="[SYS]" data-text="initializing modules...">
                             <span class="TerminalLineNumber">02</span>
                             <p class="TerminalText">
                                 <span class="TerminalTag"></span>
@@ -100,12 +87,7 @@
                             </p>
                         </div>
 
-                        <div
-                            class="TerminalLine"
-                            data-line="03"
-                            data-tag="[FS]"
-                            data-text="loading projects..."
-                        >
+                        <div class="TerminalLine" data-line="03" data-tag="[FS]" data-text="loading projects...">
                             <span class="TerminalLineNumber">03</span>
                             <p class="TerminalText">
                                 <span class="TerminalTag"></span>
@@ -113,24 +95,14 @@
                             </p>
                         </div>
 
-                        <div
-                            class="TerminalLine TerminalLine--success"
-                            data-line="04"
-                            data-tag=""
-                            data-text="READY."
-                        >
+                        <div class="TerminalLine TerminalLine--success" data-line="04" data-tag="" data-text="READY.">
                             <span class="TerminalLineNumber">04</span>
                             <p class="TerminalText">
                                 <span class="TerminalTyped"></span>
                             </p>
                         </div>
 
-                        <div
-                            class="TerminalLine TerminalLine--hint"
-                            data-line="05"
-                            data-tag=""
-                            data-text="Type 'help' to begin."
-                        >
+                        <div class="TerminalLine TerminalLine--hint" data-line="05" data-tag="" data-text="Type 'help' to begin.">
                             <span class="TerminalLineNumber">05</span>
                             <p class="TerminalText">
                                 <span class="TerminalTyped"></span>
@@ -138,24 +110,59 @@
                         </div>
                     </div>
 
+                    <div id="session-log" class="TerminalLog TerminalLog--session"></div>
+
                     <script>
                         const log = document.getElementById("boot-log");
-                        if (!log) {
-                            console.warn(
-                                "[boot] #boot-log not found; skipping boot typing animation.",
-                            );
-                        } else {
+                        const sessionLog =
+                            document.getElementById("session-log");
+                        const promptInput =
+                            document.getElementById("prompt-input");
+
+                        const appendBlock = (
+                            command,
+                            output,
+                            isError = false,
+                        ) => {
+                            if (!sessionLog) return;
+
+                            const block = document.createElement("div");
+                            block.className = "SessionBlock";
+
+                            const commandLine = document.createElement("div");
+                            commandLine.className = "SessionCommand";
+                            commandLine.textContent = `rishi@rishi.sh:~$ ${command}`;
+
+                            const outputPre = document.createElement("pre");
+                            outputPre.className = isError
+                                ? "SessionOutput SessionOutput--error"
+                                : "SessionOutput";
+                            outputPre.textContent = output;
+
+                            block.appendChild(commandLine);
+                            block.appendChild(outputPre);
+                            sessionLog.appendChild(block);
+
+                            sessionLog.scrollTop = sessionLog.scrollHeight;
+                        };
+
+                        const clearSession = () => {
+                            if (sessionLog) sessionLog.innerHTML = "";
+                        };
+
+                        const runBootSequence = async (bootLogEl) => {
+                            if (!bootLogEl) return;
+
                             const sleep = (ms) =>
                                 new Promise((r) => setTimeout(r, ms));
 
-                            // Jitter settings (tune these)
-                            const BASE_CHAR_DELAY = 18; // average ms per char
-                            const JITTER = 26; // +/- randomness
-                            const LINE_PAUSE_MIN = 120; // pause between lines
+                            const BASE_CHAR_DELAY = 18;
+                            const JITTER = 26;
+                            const LINE_PAUSE_MIN = 120;
                             const LINE_PAUSE_JITTER = 240;
 
                             const allLines = Array.from(
-                                log.querySelectorAll(".TerminalLine"),
+                                bootLogEl.querySelectorAll(".TerminalLine"),
                             );
 
                             const randInt = (min, max) =>
@@ -174,7 +181,6 @@
                                 const text =
                                     lineEl.getAttribute("data-text") || "";
 
-                                // Render tag (if any)
                                 if (tagEl) {
                                     tagEl.textContent = tag ? tag + " " : "";
                                 }
@@ -184,7 +190,6 @@
                                 for (let i = 0; i < text.length; i++) {
                                     typedEl.textContent += text[i];
 
-                                    // occasional longer stalls to feel "systemy"
                                     const isPunctuation = /[.,:;!?]/.test(
                                         text[i],
                                     );
@@ -202,51 +207,84 @@
                                     await sleep(delay);
                                 }
 
-                                // Pause between lines
                                 await sleep(
                                     LINE_PAUSE_MIN +
                                         randInt(0, LINE_PAUSE_JITTER),
                                 );
                             };
 
-                            const promptInput =
-                                document.getElementById("prompt-input");
-                            if (promptInput) promptInput.disabled = true;
+                            for (const line of allLines) {
+                                await typeLine(line);
+                            }
+                        };
 
-                            (async () => {
-                                for (const line of allLines) {
-                                    await typeLine(line);
+                        const initPromptSession = (inputEl, bootLogEl) => {
+                            if (!inputEl) return;
+                        
+                            let hasEnteredSessionMode = false;
+                            const bootRoot = document.querySelector(".Boot");
+                        
+                            inputEl.addEventListener("keydown", (e) => {
+                                if (e.key !== "Enter") return;
+                                e.preventDefault();
+                        
+                                const raw = inputEl.value.trim();
+                                if (!raw) return;
+                        
+                                if (!hasEnteredSessionMode) {
+                                    hasEnteredSessionMode = true;
+                                    if (bootLogEl) bootLogEl.style.display = "none";
+                                    if (bootRoot) bootRoot.classList.add("Boot--session");
                                 }
+                        
+                            const result = executeCommand(raw);
+                        
+                            if (result.clear) {
+                                clearSession();
+                            } else {
+                                appendBlock(raw, result.output, Boolean(result.error));
+                            }
+                        
+                            inputEl.value = "";
+                            });
+                        };
 
-                                // Enable prompt input/cursor after the help line finishes.
+
+                        (async () => {
+                            if (!log) {
+                                console.warn(
+                                    "[boot] #boot-log not found; skipping boot typing animation.",
+                                );
                                 if (promptInput) {
                                     promptInput.disabled = false;
                                     promptInput.focus();
+                                    initPromptSession(promptInput, null);
                                 }
-                            })();
-                        }
+                                return;
+                            }
+
+                            if (promptInput) promptInput.disabled = true;
+
+                            await runBootSequence(log);
+
+                            if (promptInput) {
+                                promptInput.disabled = false;
+                                promptInput.focus();
+                                initPromptSession(promptInput, log);
+                            }
+                        })();
                     </script>
 
                     <footer class="PromptBar">
                         <div class="PromptBarInner">
                             <div class="Prompt">
                                 <span class="PromptPrefix">
-                                    <span class="PromptHost"
-                                        >rishi@rishi.sh</span
-                                    >
+                                    <span class="PromptHost">rishi@rishi.sh</span>
                                     <span class="PromptDim">:</span>
                                     <span class="PromptCwd">~</span>
                                     <span class="PromptDim">$</span>
                                 </span>
-                                <input
-                                    id="prompt-input"
-                                    class="PromptInput"
-                                    type="text"
-                                    autocomplete="off"
-                                    autocapitalize="off"
-                                    spellcheck="false"
-                                    disabled
-                                />
+                                <input id="prompt-input" class="PromptInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" disabled/>
                             </div>
                         </div>
                     </footer>
