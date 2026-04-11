@@ -1,0 +1,237 @@
+<section class="Terminal">
+  <div class="TerminalWindow">
+    <!-- Window Controls -->
+    <div class="TerminalControls">
+      <span class="TerminalDot TerminalDot--red"></span>
+      <span class="TerminalDot TerminalDot--gray"></span>
+      <span class="TerminalDot TerminalDot--blue"></span>
+    </div>
+
+    <!-- Terminal Content -->
+    <div class="TerminalBody">
+      <div class="TerminalLog" id="boot-log">
+        <div class="TerminalLine" data-line="01" data-tag="[INFO]" data-text="rishi.sh...">
+          <span class="TerminalLineNumber">01</span>
+          <p class="TerminalText">
+            <span class="TerminalTag"></span>
+            <span class="TerminalTyped"></span>
+          </p>
+        </div>
+
+        <div class="TerminalLine" data-line="02" data-tag="[SYS]" data-text="initializing modules...">
+          <span class="TerminalLineNumber">02</span>
+          <p class="TerminalText">
+            <span class="TerminalTag"></span>
+            <span class="TerminalTyped"></span>
+          </p>
+        </div>
+
+        <div class="TerminalLine" data-line="03" data-tag="[FS]" data-text="loading projects...">
+          <span class="TerminalLineNumber">03</span>
+          <p class="TerminalText">
+            <span class="TerminalTag"></span>
+            <span class="TerminalTyped"></span>
+          </p>
+        </div>
+
+        <div class="TerminalLine TerminalLine--success" data-line="04" data-tag="" data-text="READY.">
+          <span class="TerminalLineNumber">04</span>
+          <p class="TerminalText">
+            <span class="TerminalTyped"></span>
+          </p>
+        </div>
+
+        <div class="TerminalLine TerminalLine--hint" data-line="05" data-tag="" data-text="Type 'help' to begin.">
+          <span class="TerminalLineNumber">05</span>
+          <p class="TerminalText">
+            <span class="TerminalTyped"></span>
+          </p>
+        </div>
+      </div>
+
+      <div id="session-log" class="TerminalLog TerminalLog--session"></div>
+
+      <script>
+        import { executeCommand } from "../lib/engine";
+
+        const log = document.getElementById("boot-log");
+        const sessionLog = document.getElementById("session-log");
+        const promptInput = document.getElementById(
+          "prompt-input",
+        ) as HTMLInputElement | null;
+
+        const appendBlock = (
+          command: string,
+          output: string,
+          isError = false,
+        ) => {
+          if (!sessionLog) return;
+
+          const block = document.createElement("div");
+          block.className = "SessionBlock";
+
+          const commandLine = document.createElement("div");
+          commandLine.className = "SessionCommand";
+
+          const promptSpan = document.createElement("span");
+          promptSpan.className = "SessionPrompt";
+          promptSpan.textContent = "rishi@rishi.sh:~$";
+
+          const commandSpan = document.createElement("span");
+          commandSpan.className = "SessionCommandText";
+          commandSpan.textContent = command;
+
+          commandLine.appendChild(promptSpan);
+          commandLine.appendChild(commandSpan);
+
+          const outputPre = document.createElement("pre");
+          outputPre.className = isError
+            ? "SessionOutput SessionOutput--error"
+            : "SessionOutput";
+          outputPre.textContent = output;
+
+          block.appendChild(commandLine);
+          block.appendChild(outputPre);
+          sessionLog.appendChild(block);
+
+          sessionLog.scrollTop = sessionLog.scrollHeight;
+        };
+
+        const clearSession = () => {
+          if (sessionLog) sessionLog.innerHTML = "";
+        };
+
+        const runBootSequence = async (bootLogEl: HTMLElement | null) => {
+          if (!bootLogEl) return;
+
+          const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+          const BASE_CHAR_DELAY = 18;
+          const JITTER = 26;
+          const LINE_PAUSE_MIN = 120;
+          const LINE_PAUSE_JITTER = 240;
+
+          const allLines = Array.from(
+            bootLogEl.querySelectorAll(".TerminalLine"),
+          );
+
+          const randInt = (min: number, max: number) =>
+            Math.floor(Math.random() * (max - min + 1)) + min;
+
+          const typeLine = async (lineEl: Element) => {
+            const tagEl = lineEl.querySelector(".TerminalTag");
+            const typedEl = lineEl.querySelector(".TerminalTyped");
+            if (!typedEl) return;
+
+            const tag = lineEl.getAttribute("data-tag") || "";
+            const text = lineEl.getAttribute("data-text") || "";
+
+            if (tagEl) {
+              tagEl.textContent = tag ? tag + " " : "";
+            }
+
+            typedEl.textContent = "";
+
+            for (let i = 0; i < text.length; i++) {
+              typedEl.textContent += text[i];
+
+              const isPunctuation = /[.,:;!?]/.test(text[i]);
+              const stall = isPunctuation ? randInt(40, 140) : 0;
+
+              const delay = Math.max(
+                0,
+                BASE_CHAR_DELAY + randInt(-JITTER, JITTER) + stall,
+              );
+
+              await sleep(delay);
+            }
+
+            await sleep(LINE_PAUSE_MIN + randInt(0, LINE_PAUSE_JITTER));
+          };
+
+          for (const line of allLines) {
+            await typeLine(line);
+          }
+        };
+
+        const initPromptSession = (
+          inputEl: HTMLInputElement | null,
+          bootLogEl: HTMLElement | null,
+        ) => {
+          if (!inputEl) return;
+
+          let hasEnteredSessionMode = false;
+          const bootRoot = document.querySelector(".Boot");
+
+          inputEl.addEventListener("keydown", (e: KeyboardEvent) => {
+            if (e.key !== "Enter") return;
+            e.preventDefault();
+
+            const raw = inputEl.value.trim();
+            if (!raw) return;
+
+            if (!hasEnteredSessionMode) {
+              hasEnteredSessionMode = true;
+              if (bootLogEl) bootLogEl.style.display = "none";
+              if (bootRoot) bootRoot.classList.add("Boot--session");
+            }
+
+            try {
+              const result = executeCommand(raw);
+
+              if (result.clear) {
+                clearSession();
+              } else {
+                appendBlock(raw, result.output, Boolean(result.error));
+              }
+            } catch (error) {
+              const message =
+                error instanceof Error ? error.message : String(error);
+              appendBlock(raw, `Runtime error: ${message}`, true);
+            } finally {
+              inputEl.value = "";
+            }
+          });
+        };
+
+        (async () => {
+          if (!log) {
+            console.warn(
+              "[boot] #boot-log not found; skipping boot typing animation.",
+            );
+            if (promptInput) {
+              promptInput.disabled = false;
+              promptInput.focus();
+              initPromptSession(promptInput, null);
+            }
+            return;
+          }
+
+          if (promptInput) promptInput.disabled = true;
+
+          await runBootSequence(log);
+
+          if (promptInput) {
+            promptInput.disabled = false;
+            promptInput.focus();
+            initPromptSession(promptInput, log);
+          }
+        })();
+      </script>
+
+      <footer class="PromptBar">
+        <div class="PromptBarInner">
+          <div class="Prompt">
+            <span class="PromptPrefix">
+              <span class="PromptHost">rishi@rishi.sh</span>
+              <span class="PromptDim">:</span>
+              <span class="PromptCwd">~</span>
+              <span class="PromptDim">$</span>
+            </span>
+            <input id="prompt-input" class="PromptInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" disabled/>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+</section>
