@@ -223,6 +223,12 @@
           block.appendChild(commandLine);
           block.appendChild(outputNode);
           sessionLog.appendChild(block);
+
+          const targetTop =
+            outputNode.getBoundingClientRect().top -
+            sessionLog.getBoundingClientRect().top +
+            sessionLog.scrollTop;
+          sessionLog.scrollTo({ top: targetTop, behavior: "auto" });
         };
 
         const clearSession = () => {
