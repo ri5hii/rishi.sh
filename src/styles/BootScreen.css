@@ -434,6 +434,52 @@
     vertical-align: middle;
   }
 
+  .SessionOutputRich .ContentSheet {
+    display: grid;
+    gap: 0.85rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .SessionOutputRich .ContentPre {
+    margin: 0;
+    padding: 0.72rem 0.8rem;
+    border: 1px solid rgba(223, 226, 235, 0.28);
+    background: rgba(24, 28, 34, 0.88);
+    color: #dfe2eb;
+    line-height: 1.4;
+    white-space: pre-wrap;
+  }
+
+  .SessionOutputRich .MarkdownCards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: 0.65rem;
+  }
+
+  .SessionOutputRich .MarkdownCard {
+    padding: 0.58rem 0.68rem;
+    border: 1px solid rgba(223, 226, 235, 0.28);
+    background: rgba(24, 28, 34, 0.88);
+  }
+
+  .SessionOutputRich .MarkdownCardTitle {
+    margin: 0 0 0.35rem;
+    color: #dfe2eb;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .SessionOutputRich .MarkdownCard ul {
+    margin: 0;
+    padding-left: 1rem;
+  }
+
+  .SessionOutputRich .MarkdownCard li {
+    margin: 0.16rem 0;
+  }
+
   .SessionOutputRich .ProjectBadgeRow {
     display: flex;
     flex-wrap: wrap;

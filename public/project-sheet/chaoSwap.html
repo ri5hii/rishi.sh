@@ -1,0 +1,59 @@
+<div class="ContentSheet ContentSheet--project">
+  <pre class="ContentPre">
+ChaoSwap
+Repository: <a href="https://github.com/ri5hii/chaoSwap">github.com/ri5hii/chaoSwap</a>
+
+Token swap and routing prototype for learning DEX mechanics
+
+ChaoSwap explores AMM-based trade execution, routing behavior, and transaction safety checks in a lightweight experimental stack.
+
+The project focuses on correctness of quote generation and predictable swap flow rather than production exchange volume.
+
+Design goal:
++- transparent swap math
++- deterministic routing behavior
++- clean developer-facing transaction flow
+  </pre>
+
+  <div class="MarkdownCards">
+    <div class="MarkdownCard">
+      <h3 class="MarkdownCardTitle">Core Features</h3>
+      <ul>
+        <li>Pair discovery and pool metadata lookup</li>
+        <li>Quote estimation with slippage controls</li>
+        <li>Swap execution pipeline with status tracking</li>
+        <li>Basic route selection across supported pools</li>
+      </ul>
+    </div>
+
+    <div class="MarkdownCard">
+      <h3 class="MarkdownCardTitle">Tech Stack</h3>
+      <ul>
+        <li>TypeScript</li>
+        <li>Ethers.js</li>
+        <li>Node.js</li>
+        <li>React (dashboard prototype)</li>
+      </ul>
+    </div>
+
+    <div class="MarkdownCard">
+      <h3 class="MarkdownCardTitle">Swap Pipeline</h3>
+      <ul>
+        <li>Input token validation</li>
+        <li>Best-route quote calculation</li>
+        <li>Allowance checks and approval gating</li>
+        <li>Transaction submission + confirmation tracking</li>
+      </ul>
+    </div>
+
+    <div class="MarkdownCard">
+      <h3 class="MarkdownCardTitle">Versioning</h3>
+      <ul>
+        <li>v0.1 pool + quote explorer</li>
+        <li>v0.2 swap execution + status states</li>
+        <li>v0.3 route refinement + UX cleanup</li>
+      </ul>
+    </div>
+
+  </div>
+</div>

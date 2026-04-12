@@ -1,15 +1,15 @@
-// GitHub username used for repository listing and metadata queries.
+// GitHub username used for live repository listing in the base projects command.
 const GITHUB_USERNAME = "ri5hii";
+const PROJECT_SHEET_ROOT = "/project-sheet";
+const PROJECT_SHEET_MANIFEST_URL = `${PROJECT_SHEET_ROOT}/manifest.json`;
 
-// Add repository names here to hide them from `projects` listing/details.
-const EXCLUDED_REPO_NAMES: string[] = ["zinnia"];
-const EXCLUDED_REPO_SET = new Set(
-  EXCLUDED_REPO_NAMES.map((name) => name.trim().toLowerCase()).filter(Boolean),
+// Add project names here to hide them from `projects` listing/details.
+const EXCLUDED_PROJECT_NAMES: string[] = ["zinnia"];
+const EXCLUDED_PROJECT_SET = new Set(
+  EXCLUDED_PROJECT_NAMES.map((name) => name.trim().toLowerCase()).filter(
+    Boolean,
+  ),
 );
-
-// Checks whether a repository should be hidden from user-facing project commands.
-const isRepoExcluded = (repoName: string) =>
-  EXCLUDED_REPO_SET.has(repoName.trim().toLowerCase());
 
 // Summary shape returned by the GitHub repositories listing endpoint.
 type RepoSummary = {
@@ -22,23 +22,15 @@ type RepoSummary = {
   updated_at: string;
 };
 
-// Detail shape returned by the GitHub single repository endpoint.
-type RepoDetail = {
-  name: string;
-  html_url: string;
-  description: string | null;
-  language: string | null;
-  stargazers_count: number;
-  forks_count: number;
-  open_issues_count: number;
-  topics?: string[];
-};
+// Manifest shape mapping repo names to project sheet file paths.
+type ProjectSheetManifest = Record<string, string>;
 
-// Session caches for project index and rendered project readmes.
 const projectIndexCache = new Map<string, string>();
-const projectReadmeCache = new Map<string, string>();
+const projectDetailCache = new Map<string, string>();
+let projectSheetManifestCache: Map<string, string> | null = null;
+let repoSummaryCache: RepoSummary[] | null = null;
 
-// Escapes raw text to safely embed repository content in HTML.
+// Escapes dynamic text before injection into html output.
 const escapeHtml = (value: string) =>
   value
     .replaceAll("&", "&amp;")
@@ -47,104 +39,105 @@ const escapeHtml = (value: string) =>
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
 
-// Normalizes badge labels for shields.io URLs.
-const toBadgeLabel = (value: string) =>
-  encodeURIComponent(value.replaceAll("_", " ").replaceAll("-", " "));
+// Resolves a public asset path for browser runtime and local Bun file runtime.
+const resolvePublicFetchUrl = (publicPath: string) => {
+  const normalized = publicPath.startsWith("/") ? publicPath : `/${publicPath}`;
 
-// Creates a shields.io badge image for project metadata rows.
-const buildBadgeImg = (label: string, message: string, color: string) => {
-  const src = `https://img.shields.io/badge/${toBadgeLabel(label)}-${toBadgeLabel(message)}-${color}?style=flat-square`;
-  return `<img src="${src}" alt="${escapeHtml(label)} ${escapeHtml(message)} badge" />`;
+  if (typeof window !== "undefined") {
+    return normalized;
+  }
+
+  const withoutLeadingSlash = normalized.replace(/^\/+/, "");
+  return new URL(
+    `../../public/${withoutLeadingSlash}`,
+    import.meta.url,
+  ).toString();
 };
 
-// Fetches full repository metadata used for README detail headers.
-const fetchRepoDetail = async (repoName: string): Promise<RepoDetail> => {
+// Normalizes repository identifiers for case-insensitive comparisons.
+const normalizeRepoName = (repoName: string) => repoName.trim().toLowerCase();
+
+// Checks if a project is excluded by local config.
+const isProjectExcluded = (name: string) =>
+  EXCLUDED_PROJECT_SET.has(normalizeRepoName(name));
+
+// Sanitizes sheet paths from manifest entries into public-root absolute html paths.
+const normalizeSheetPath = (rawPath: string) => {
+  const trimmed = rawPath.trim();
+  if (!trimmed || trimmed.includes("..")) return null;
+
+  const withoutLeadingSlash = trimmed.replace(/^\/+/, "");
+  const prefixed = withoutLeadingSlash.startsWith("project-sheet/")
+    ? withoutLeadingSlash
+    : `project-sheet/${withoutLeadingSlash}`;
+
+  if (!prefixed.endsWith(".html")) return null;
+  return `/${prefixed}`;
+};
+
+// Loads and memoizes the project sheet manifest mapping.
+const fetchProjectSheetManifest = async (): Promise<Map<string, string>> => {
+  if (projectSheetManifestCache) return projectSheetManifestCache;
+
   const response = await fetch(
-    `https://api.github.com/repos/${GITHUB_USERNAME}/${encodeURIComponent(repoName)}`,
+    resolvePublicFetchUrl(PROJECT_SHEET_MANIFEST_URL),
     {
       headers: {
-        Accept: "application/vnd.github+json",
+        Accept: "application/json",
       },
     },
   );
 
   if (!response.ok) {
-    if (response.status === 404) {
-      throw new Error(`Repository not found: ${repoName}`);
-    }
-    throw new Error(`Unable to load repository metadata (${response.status}).`);
+    throw new Error(
+      `Unable to load project sheet manifest (${response.status}).`,
+    );
   }
 
-  return (await response.json()) as RepoDetail;
-};
-
-// Builds the metadata header block shown above rendered project README content.
-const buildProjectHeaderHtml = (repo: RepoDetail) => {
-  const badges: string[] = [];
-
-  if (repo.language) {
-    badges.push(buildBadgeImg("Language", repo.language, "1f6feb"));
+  const rawText = await response.text();
+  if (!rawText.trim()) {
+    projectSheetManifestCache = new Map<string, string>();
+    return projectSheetManifestCache;
   }
 
-  badges.push(buildBadgeImg("Stars", String(repo.stargazers_count), "f59e0b"));
-  badges.push(buildBadgeImg("Forks", String(repo.forks_count), "0ea5e9"));
-  badges.push(
-    buildBadgeImg("Issues", String(repo.open_issues_count), "ef4444"),
-  );
-
-  const topics = (repo.topics ?? []).slice(0, 8);
-  for (const topic of topics) {
-    badges.push(buildBadgeImg("Tech", topic, "22c55e"));
-  }
-
-  const description = repo.description
-    ? `<p>${escapeHtml(repo.description)}</p>`
-    : "";
-
-  return [
-    `<h2>${escapeHtml(repo.name)}</h2>`,
-    description,
-    `<p><a href="${repo.html_url}">Open repository in GitHub</a></p>`,
-    `<div class="ProjectBadgeRow">${badges.join("\n")}</div>`,
-    `<hr />`,
-  ]
-    .filter(Boolean)
-    .join("\n");
-};
-
-// Renders README markdown via GitHub API and falls back to plain preformatted content.
-const renderMarkdownToHtml = async (markdown: string, contextRepo: string) => {
+  let rawManifest: unknown;
   try {
-    const response = await fetch("https://api.github.com/markdown", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/vnd.github+json",
-      },
-      body: JSON.stringify({
-        text: markdown,
-        mode: "gfm",
-        context: `${GITHUB_USERNAME}/${contextRepo}`,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`GitHub markdown render failed (${response.status})`);
-    }
-
-    const html = await response.text();
-    if (!html.trim()) {
-      throw new Error("Rendered markdown was empty.");
-    }
-
-    return html;
+    rawManifest = JSON.parse(rawText) as unknown;
   } catch {
-    return `<pre>${escapeHtml(markdown)}</pre>`;
+    throw new Error("Invalid JSON in /project-sheet/manifest.json.");
   }
+
+  if (
+    !rawManifest ||
+    typeof rawManifest !== "object" ||
+    Array.isArray(rawManifest)
+  ) {
+    throw new Error("Project sheet manifest must be a key/value JSON object.");
+  }
+
+  const normalized = new Map<string, string>();
+  for (const [key, value] of Object.entries(
+    rawManifest as ProjectSheetManifest,
+  )) {
+    if (typeof value !== "string") continue;
+
+    const repoName = normalizeRepoName(key);
+    if (!repoName) continue;
+
+    const normalizedPath = normalizeSheetPath(value);
+    if (!normalizedPath) continue;
+
+    normalized.set(repoName, normalizedPath);
+  }
+
+  projectSheetManifestCache = normalized;
+  return normalized;
 };
 
-// Fetches all repositories for the configured user in updated order.
+// Fetches repositories from GitHub for the live projects index.
 const fetchRepos = async (): Promise<RepoSummary[]> => {
+  if (repoSummaryCache) return repoSummaryCache;
+
   const response = await fetch(
     `https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=100&sort=updated`,
     {
@@ -158,14 +151,15 @@ const fetchRepos = async (): Promise<RepoSummary[]> => {
     throw new Error(`Unable to load repositories (${response.status}).`);
   }
 
-  return (await response.json()) as RepoSummary[];
+  repoSummaryCache = (await response.json()) as RepoSummary[];
+  return repoSummaryCache;
 };
 
-// Builds the html list used by the base projects command.
+// Builds the live GitHub projects index shown for the base `projects` command.
 export const fetchProjectsIndexHtml = async (
   includeAll = false,
 ): Promise<string> => {
-  const exclusionKey = Array.from(EXCLUDED_REPO_SET).sort().join(",");
+  const exclusionKey = Array.from(EXCLUDED_PROJECT_SET).sort().join(",");
   const cacheKey = `${includeAll ? "all" : "default"}:${exclusionKey}`;
   const cached = projectIndexCache.get(cacheKey);
   if (cached) return cached;
@@ -173,70 +167,83 @@ export const fetchProjectsIndexHtml = async (
   const repos = await fetchRepos();
   const filtered = (
     includeAll ? repos : repos.filter((repo) => !repo.archived)
-  ).filter((repo) => !isRepoExcluded(repo.name));
+  ).filter((repo) => !isProjectExcluded(repo.name));
 
   const items = filtered
-    .slice(0, 12)
     .map((repo) => {
       const description = repo.description
         ? escapeHtml(repo.description)
         : "No description provided.";
-      return `<li><a href="${repo.html_url}">${repo.name}</a> — ${description} (★ ${repo.stargazers_count})</li>`;
+
+      return `<li><a href="${repo.html_url}">${escapeHtml(repo.name)}</a> — ${description} (★ ${repo.stargazers_count})</li>`;
     })
-    .join("");
+    .join("\n");
 
   const html = [
     `<h2>Projects — ${GITHUB_USERNAME}</h2>`,
-    `<p>Use <code>projects &lt;repo&gt;</code> to open a project README inside the terminal.</p>`,
-    `<ul>${items || "<li>No repositories found.</li>"}</ul>`,
+    "<p>Repository list is fetched live from GitHub. Detailed project output is resolved from <code>/public/project-sheet/manifest.json</code>.</p>",
+    `<ul>${items || "<li>No projects available.</li>"}</ul>`,
+    "<p>Run <code>projects &lt;repo&gt;</code> to open a project sheet.</p>",
   ].join("\n");
 
   projectIndexCache.set(cacheKey, html);
   return html;
 };
 
-// Builds a rendered README view for a single repository.
+// Loads manifest-mapped project sheet html for `projects <name>`.
 export const fetchProjectReadmeHtml = async (
   repoName: string,
 ): Promise<string> => {
   const normalized = repoName.trim();
   if (!normalized) {
     throw new Error(
-      "Please provide a repository name. Example: projects rishi.sh",
+      "Please provide a project name. Example: projects rishi.sh",
     );
   }
 
-  if (isRepoExcluded(normalized)) {
-    throw new Error(`Repository is excluded by local config: ${normalized}`);
+  if (isProjectExcluded(normalized)) {
+    throw new Error(`Project is excluded by local config: ${normalized}`);
   }
 
-  const cacheKey = normalized.toLowerCase();
-  const cached = projectReadmeCache.get(cacheKey);
+  const cacheKey = normalizeRepoName(normalized);
+  const cached = projectDetailCache.get(cacheKey);
   if (cached) return cached;
 
-  const readmeResponse = await fetch(
-    `https://api.github.com/repos/${GITHUB_USERNAME}/${encodeURIComponent(normalized)}/readme`,
-    {
-      headers: {
-        Accept: "application/vnd.github.raw+json",
-      },
-    },
+  const repos = await fetchRepos();
+  const hasRepo = repos.some(
+    (repo) => normalizeRepoName(repo.name) === cacheKey,
   );
 
-  if (!readmeResponse.ok) {
-    if (readmeResponse.status === 404) {
-      throw new Error(`Repository or README not found: ${normalized}`);
-    }
-    throw new Error(`Unable to load README (${readmeResponse.status}).`);
+  if (!hasRepo) {
+    throw new Error("repo name wrong.");
   }
 
-  const markdown = await readmeResponse.text();
-  const rendered = await renderMarkdownToHtml(markdown, normalized);
-  const repoMeta = await fetchRepoDetail(normalized);
-  const header = buildProjectHeaderHtml(repoMeta);
+  const manifest = await fetchProjectSheetManifest();
 
-  const html = [header, rendered].join("\n");
+  const sheetPath = manifest.get(cacheKey);
+  if (!sheetPath) {
+    throw new Error(
+      `No project-sheet manifest entry for: ${normalized}. Add it to /public/project-sheet/manifest.json.`,
+    );
+  }
 
-  projectReadmeCache.set(cacheKey, html);
+  const response = await fetch(resolvePublicFetchUrl(sheetPath), {
+    headers: {
+      Accept: "text/html, text/plain",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `Unable to load project sheet for ${normalized} (${response.status}).`,
+    );
+  }
+
+  const html = await response.text();
+  if (!html.trim()) {
+    throw new Error(`Project sheet is empty for: ${normalized}`);
+  }
+
+  projectDetailCache.set(cacheKey, html);
   return html;
 };
