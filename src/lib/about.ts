@@ -5,16 +5,17 @@ let aboutHtmlCache: string | null = null;
 
 // Resolves a public asset path for browser runtime and local Bun file runtime.
 const resolvePublicFetchUrl = (publicPath: string) => {
-  const normalized = publicPath.startsWith("/")
-    ? publicPath
-    : `/${publicPath}`;
+  const normalized = publicPath.startsWith("/") ? publicPath : `/${publicPath}`;
 
   if (typeof window !== "undefined") {
     return normalized;
   }
 
   const withoutLeadingSlash = normalized.replace(/^\/+/, "");
-  return new URL(`../../public/${withoutLeadingSlash}`, import.meta.url).toString();
+  return new URL(
+    `../../public/${withoutLeadingSlash}`,
+    import.meta.url,
+  ).toString();
 };
 
 // Loads and caches about output from a local public HTML sheet.

@@ -1,5 +1,12 @@
-/* BootScreen styles define terminal shell layout, responsive behavior, and command output themes. */
+/*
+  BootScreen styles define terminal shell layout, responsive behavior, and command output themes.
+  Primary markup sources:
+  - src/components/BootScreen.astro (Boot shell, header, banner)
+  - src/components/TerminalScreen.astro (window, logs, prompt)
+  - Runtime-inserted nodes from TerminalScreen script (.Session* blocks)
+*/
 @layer components {
+  /* BootScreen.astro: root boot wrapper (<div class="Boot">). */
   .Boot {
     --shell-gutter: clamp(0.4rem, 1.25vw, 1rem);
     --promptbar-height: clamp(3.4rem, 7.2vh, 4.8rem);
@@ -9,7 +16,7 @@
     padding-bottom: calc(var(--promptbar-height) + env(safe-area-inset-bottom));
   }
 
-  /* Header */
+  /* BootScreen.astro: top header container (<header class="Header">). */
   .Header {
     @apply w-full max-w-screen-2xl mx-auto bg-[#10141a] z-50;
     @apply flex flex-col items-center;
@@ -23,6 +30,7 @@
     padding-bottom: clamp(0.2rem, 0.9vh, 0.4rem);
   }
 
+  /* BootScreen.astro: right-aligned header row containing the switch button. */
   .HeaderInner {
     @apply w-full flex justify-end;
     margin-bottom: clamp(0.9rem, 3.1vh, 2rem);
@@ -41,11 +49,13 @@
     font-size: clamp(0.7rem, 1vw, 0.86rem);
   }
 
+  /* BootScreen.astro: shared button base used by the switch UI button. */
   .Button {
     @apply inline-flex items-center gap-2;
     min-width: 0;
   }
 
+  /* BootScreen.astro: specific visual treatment for "Switch UI" button text. */
   .Button--switch {
     @apply uppercase transition-opacity;
     @apply text-[#dfe2eb]/60 hover:text-[#58a6ff] hover:opacity-80;
@@ -56,6 +66,7 @@
     white-space: nowrap;
   }
 
+  /* BootScreen.astro: material symbol icon inside the switch button. */
   .ButtonIndicator {
     @apply inline-block align-middle opacity-80;
     font-size: clamp(0.82rem, 1.45vw, 1rem);
@@ -67,16 +78,18 @@
       "GRAD" 0;
   }
 
+  /* BootScreen.astro: textual label inside the switch button. */
   .ButtonText {
     @apply leading-none;
   }
 
-  /* Banner */
+  /* BootScreen.astro: banner wrapper containing animated ASCII title frames. */
   .Banner {
     @apply w-full flex justify-center;
     overflow-x: clip;
   }
 
+  /* BootScreen.astro: frame stacking context for title glitch effect. */
   .BannerStack {
     position: relative;
     display: inline-block;
@@ -84,6 +97,7 @@
     max-width: 100%;
   }
 
+  /* BootScreen.astro: shared base typography for all ASCII banner frames. */
   .BannerText {
     @apply font-mono whitespace-pre leading-none;
     font-size: clamp(0.36rem, 1.48vw, 1.72rem);
@@ -96,12 +110,14 @@
     font-size: clamp(0.28rem, 0.74vw, 0.86rem);
   }
 
+  /* BootScreen.astro: hidden sizer frame for stable layout sizing. */
   .BannerText--sizer {
     position: relative;
     visibility: hidden;
     pointer-events: none;
   }
 
+  /* BootScreen.astro: overlay frames participating in glitch animation cycle. */
   .BannerText--frame-base,
   .BannerText--frame-glitchA,
   .BannerText--frame-base2,
@@ -195,17 +211,18 @@
     }
   }
 
-  /* Proper layout container */
+  /* BootScreen.astro: main output area wrapping TerminalScreen component. */
   .Output {
     @apply flex-1 min-h-0 flex;
     min-width: 0;
   }
 
-  /* Terminal defaults (full-capable) */
+  /* TerminalScreen.astro: terminal section root (<section class="Terminal">). */
   .Terminal {
     @apply flex-1 min-h-0 w-full h-full flex items-stretch justify-stretch px-0;
   }
 
+  /* TerminalScreen.astro: terminal window panel (<div class="TerminalWindow">). */
   .TerminalWindow {
     @apply w-full max-w-none h-full min-h-0 relative overflow-hidden
         bg-[#181c22] rounded-none border-y border-[#dfe2eb]/10 border-x-0
@@ -213,18 +230,19 @@
     padding: clamp(0.9rem, 2.1vw, 1.5rem);
   }
 
-  /* Boot mode compact card */
+  /* Boot mode only: center and constrain terminal card before session starts. */
   .Boot:not(.Boot--session) .Terminal {
     @apply items-center justify-center;
     padding-inline: clamp(0.6rem, 3vw, 1.5rem);
   }
 
+  /* Boot mode only: compact bordered card variant of terminal window. */
   .Boot:not(.Boot--session) .TerminalWindow {
     @apply max-w-3xl h-auto min-h-0 rounded-md border border-[#dfe2eb]/10 border-x;
     width: min(100%, 56rem);
   }
 
-  /* Session mode explicitly full-size */
+  /* Session mode only: expand output area to fill screen-safe viewport. */
   .Boot--session .Output {
     @apply flex-1 min-h-0;
     box-sizing: border-box;
@@ -234,19 +252,18 @@
     padding-bottom: clamp(0.75rem, 2.2vh, 1.35rem);
   }
 
-  .Boot--session .Terminal {
-    @apply flex-1 min-h-0 w-full h-full items-stretch justify-stretch px-0;
-  }
-
+  /* Session mode only: full-size terminal panel once interactive mode starts. */
   .Boot--session .TerminalWindow {
     @apply w-full max-w-none h-full min-h-0 rounded-none border border-[#dfe2eb]/10 flex flex-col;
   }
 
+  /* TerminalScreen.astro: macOS-style traffic-light controls row. */
   .TerminalControls {
     @apply flex gap-2 opacity-30;
     margin-bottom: clamp(0.65rem, 2.2vh, 1.25rem);
   }
 
+  /* TerminalScreen.astro: individual control dots inside window controls. */
   .TerminalDot {
     @apply w-3 h-3 rounded-full;
   }
@@ -263,10 +280,12 @@
     @apply bg-[#a2c9ff];
   }
 
+  /* TerminalScreen.astro: terminal body wrapper for boot and session logs. */
   .TerminalBody {
     @apply text-[#dfe2eb] font-mono flex-1 min-h-0 flex flex-col;
   }
 
+  /* TerminalScreen.astro: shared log text container style. */
   .TerminalLog {
     @apply space-y-2 leading-relaxed;
     font-size: clamp(0.78rem, 1.45vw, 1rem);
@@ -281,6 +300,7 @@
     animation: terminal-reveal 220ms ease-out both;
   }
 
+  /* TerminalScreen.astro: boot lines and session command lines. */
   .TerminalLine {
     @apply flex items-start gap-4;
     opacity: 1;
@@ -288,14 +308,17 @@
     min-width: 0;
   }
 
+  /* TerminalScreen.astro: boot line number column. */
   .TerminalLineNumber {
     @apply text-[#dfe2eb]/30 select-none;
   }
 
+  /* TerminalScreen.astro: main text segment inside boot lines. */
   .TerminalText {
     @apply text-[#dfe2eb];
   }
 
+  /* TerminalScreen.astro: boot line tag token like [INFO], [SYS], etc. */
   .TerminalTag {
     @apply text-[#58a6ff];
   }
@@ -312,15 +335,7 @@
     @apply text-[#dfe2eb]/80;
   }
 
-  .TerminalCommand {
-    @apply text-[#58a6ff] underline decoration-dotted underline-offset-4;
-  }
-
-  .TerminalGlow {
-    @apply absolute -bottom-12 -right-12 w-48 h-48 rounded-full blur-3xl;
-    @apply bg-[#a2c9ff]/5;
-  }
-
+  /* TerminalScreen.astro: dedicated session output log container (#session-log). */
   .TerminalLog--session {
     @apply mt-4;
   }
@@ -330,23 +345,28 @@
     overflow-anchor: none;
   }
 
+  /* Runtime-generated by TerminalScreen script: each command + output group. */
   .SessionBlock {
     @apply mt-4;
   }
 
+  /* Runtime-generated: command row containing prompt and typed command text. */
   .SessionCommand {
     @apply font-mono flex items-baseline gap-2 text-left;
     font-size: clamp(0.78rem, 1.4vw, 1rem);
   }
 
+  /* Runtime-generated: prompt prefix (rishi@rishi.sh:~$). */
   .SessionPrompt {
     @apply text-[#a2c9ff]/75;
   }
 
+  /* Runtime-generated: user-entered command token. */
   .SessionCommandText {
     @apply text-[#ffb3ad];
   }
 
+  /* Runtime-generated: plain text output blocks (<pre class="SessionOutput">). */
   .SessionOutput {
     @apply mt-2 text-[#dfe2eb] font-mono;
     font-size: clamp(0.78rem, 1.4vw, 1rem);
@@ -354,6 +374,7 @@
     margin: 0;
   }
 
+  /* Runtime-generated: neofetch plain text variant with horizontal scrolling. */
   .SessionOutput--neofetch {
     white-space: pre;
     overflow-x: auto;
@@ -365,6 +386,7 @@
     -webkit-overflow-scrolling: touch;
   }
 
+  /* Runtime-generated: rich HTML output root container. */
   .SessionOutputRich {
     @apply mt-2 text-[#dfe2eb];
     font-size: clamp(0.78rem, 1.4vw, 1rem);
@@ -382,6 +404,7 @@
     margin-bottom: 0;
   }
 
+  /* Rich-output markdown heading levels rendered by command HTML payloads. */
   .SessionOutputRich h1,
   .SessionOutputRich h2,
   .SessionOutputRich h3,
@@ -391,6 +414,7 @@
     line-height: 1.25;
   }
 
+  /* Rich-output generic paragraph/list spacing rhythm. */
   .SessionOutputRich p,
   .SessionOutputRich ul,
   .SessionOutputRich ol,
@@ -407,6 +431,7 @@
     margin: 0.2rem 0;
   }
 
+  /* Rich-output code surfaces for inline and block code. */
   .SessionOutputRich pre,
   .SessionOutputRich code {
     @apply font-mono text-[#dfe2eb];
@@ -423,6 +448,7 @@
     padding: 0.08rem 0.3rem;
   }
 
+  /* Rich-output media and links. */
   .SessionOutputRich a {
     @apply text-[#58a6ff] underline;
   }
@@ -434,6 +460,7 @@
     vertical-align: middle;
   }
 
+  /* Rich-output content sheet wrappers used by about/project authored sheets. */
   .SessionOutputRich .ContentSheet {
     display: grid;
     gap: 0.85rem;
@@ -442,6 +469,7 @@
     background: transparent;
   }
 
+  /* Rich-output preformatted intro block in about/project sheets. */
   .SessionOutputRich .ContentPre {
     margin: 0;
     padding: 0.72rem 0.8rem;
@@ -452,18 +480,21 @@
     white-space: pre-wrap;
   }
 
+  /* Rich-output responsive card grid used by authored sheet sections. */
   .SessionOutputRich .MarkdownCards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
     gap: 0.65rem;
   }
 
+  /* Rich-output card surface inside authored sheet grids. */
   .SessionOutputRich .MarkdownCard {
     padding: 0.58rem 0.68rem;
     border: 1px solid rgba(223, 226, 235, 0.28);
     background: rgba(24, 28, 34, 0.88);
   }
 
+  /* Rich-output card heading text in authored sheet cards. */
   .SessionOutputRich .MarkdownCardTitle {
     margin: 0 0 0.35rem;
     color: #dfe2eb;
@@ -480,6 +511,7 @@
     margin: 0.16rem 0;
   }
 
+  /* Project README metadata badges inserted by project renderer. */
   .SessionOutputRich .ProjectBadgeRow {
     display: flex;
     flex-wrap: wrap;
@@ -494,6 +526,7 @@
     height: 20px;
   }
 
+  /* Neofetch split layout generated by engine.ts HTML output. */
   .SessionOutputRich .NeofetchSplit {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
@@ -512,15 +545,18 @@
     overflow: visible;
   }
 
+  /* Neofetch left-side ASCII logo pre block. */
   .SessionOutputRich .NeofetchLogo {
     color: #dfe2eb;
   }
 
+  /* Neofetch right-side system info pre block. */
   .SessionOutputRich .NeofetchInfo {
     color: #dfe2eb;
     min-width: 0;
   }
 
+  /* Whoami split layout generated by engine.ts HTML output. */
   .SessionOutputRich .WhoamiNeo {
     --whoami-line-height: 1.45em;
     --whoami-line-count: 8;
@@ -533,6 +569,7 @@
     gap: clamp(0.65rem, 2vw, 1rem);
   }
 
+  /* Whoami metadata column with key/value rows. */
   .SessionOutputRich .WhoamiNeoMeta {
     display: flex;
     flex-direction: column;
@@ -541,16 +578,19 @@
     line-height: var(--whoami-line-height);
   }
 
+  /* Whoami top title line (host identifier). */
   .SessionOutputRich .WhoamiNeoTitle {
     color: #a2c9ff;
     font-weight: 600;
   }
 
+  /* Whoami horizontal separator line beneath title. */
   .SessionOutputRich .WhoamiNeoRule {
     color: rgba(223, 226, 235, 0.46);
     letter-spacing: 0.02em;
   }
 
+  /* Whoami key/value row grid. */
   .SessionOutputRich .WhoamiNeoRow {
     display: grid;
     grid-template-columns: 8ch 1ch minmax(0, 1fr);
@@ -573,6 +613,7 @@
     overflow-wrap: anywhere;
   }
 
+  /* Whoami avatar image block. */
   .SessionOutputRich .WhoamiAvatar {
     width: 100%;
     max-width: 100%;
@@ -587,6 +628,7 @@
     place-self: start center;
   }
 
+  /* Rich-output table fallback styling. */
   .SessionOutputRich table {
     width: 100%;
     display: block;
@@ -594,11 +636,12 @@
     border-collapse: collapse;
   }
 
+  /* Shared error color for text and rich output error blocks. */
   .SessionOutput--error {
     @apply text-[#ffb4ab];
   }
 
-  /* Footer prompt bar */
+  /* TerminalScreen.astro: fixed footer prompt container (<footer class="PromptBar">). */
   .PromptBar {
     @apply fixed bottom-0 left-0 w-full z-50;
     @apply flex items-center;
@@ -614,6 +657,7 @@
     border-top-width: 1px;
   }
 
+  /* Session mode prompt shell variant (bounded, bordered, elevated). */
   .Boot--session .PromptBar {
     @apply border border-[#dfe2eb]/10;
     border-top-width: 1px;
@@ -640,20 +684,24 @@
     }
   }
 
+  /* Prompt inner width wrapper. */
   .PromptBarInner {
     @apply max-w-screen-2xl mx-auto w-full min-w-0 flex items-center;
   }
 
+  /* Prompt row with prefix and input field. */
   .Prompt {
     @apply w-full min-w-0 flex items-center font-mono;
     font-size: clamp(0.8rem, 1.45vw, 1rem);
   }
 
+  /* Prompt input stack wrapper used for ghost autocomplete overlay. */
   .PromptInputWrap {
     @apply relative flex-1 min-w-0;
     margin-left: 1ch;
   }
 
+  /* Ghost autocomplete preview text layer under input caret text. */
   .PromptAutocompletePreview {
     @apply absolute inset-y-0 left-0 flex items-center select-none;
     @apply text-[#dfe2eb]/32 font-mono pointer-events-none;
@@ -666,6 +714,7 @@
     z-index: 0;
   }
 
+  /* Prompt prefix segment containing host, cwd, and symbol separators. */
   .PromptPrefix {
     @apply inline-flex items-center gap-2;
     min-width: 0;
@@ -673,6 +722,7 @@
     flex: 0 1 auto;
   }
 
+  /* Hostname segment inside prompt prefix. */
   .PromptHost {
     @apply text-[#58a6ff];
     max-width: min(44vw, 14rem);
@@ -680,14 +730,17 @@
     text-overflow: ellipsis;
   }
 
+  /* Dim punctuation separators in prompt prefix. */
   .PromptDim {
     @apply text-[#dfe2eb]/40;
   }
 
+  /* Current working directory segment in prompt prefix. */
   .PromptCwd {
     @apply text-[#a2c9ff];
   }
 
+  /* Actual command input control (#prompt-input). */
   .PromptInput {
     @apply bg-transparent outline-none border-0 text-[#dfe2eb] font-mono;
     flex: 1;
@@ -719,12 +772,7 @@
     opacity: 0.35;
   }
 
-  .CursorBlink {
-    @apply inline-block align-middle ml-1;
-    @apply w-[10px] h-[1.2em];
-    @apply bg-[#a2c9ff];
-  }
-
+  /* Mobile/tablet adjustments for terminal spacing and rich-output layouts. */
   @media (max-width: 768px) {
     .TerminalLine {
       gap: 0.62rem;
@@ -765,6 +813,7 @@
     }
   }
 
+  /* Narrow-phone adjustments for header, prompt, and whoami/neofetch density. */
   @media (max-width: 540px) {
     .Header {
       padding-top: clamp(0.55rem, 2.4vh, 0.9rem);
@@ -826,6 +875,7 @@
     }
   }
 
+  /* Very-small viewport compaction rules for banner and prompt prefix. */
   @media (max-width: 400px) {
     .BannerText {
       font-size: clamp(0.3rem, 1.22vw, 0.68rem);

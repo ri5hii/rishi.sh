@@ -19,17 +19,18 @@ Designed for systems where reliability, control, and scalability of background w
   </pre>
 
   <div class="MarkdownCards">
-
     <div class="MarkdownCard">
       <h3 class="MarkdownCardTitle">System Design</h3>
       <ul>
-        <li>Two-tier concurrency model:
+        <li>
+          Two-tier concurrency model:
           <ul>
             <li>- Worker pool (bounded job-level parallelism)</li>
             <li>- Chunked fan-out using errgroup (item-level parallelism)</li>
           </ul>
         </li>
-        <li>Strict separation of concerns:
+        <li>
+          Strict separation of concerns:
           <ul>
             <li>- Jobs define logic</li>
             <li>- Engine handles execution</li>
@@ -37,7 +38,10 @@ Designed for systems where reliability, control, and scalability of background w
             <li>- Constructors bridge JSON → typed jobs</li>
           </ul>
         </li>
-        <li>Context-driven cancellation ensures all in-flight work stops on failure</li>
+        <li>
+          Context-driven cancellation ensures all in-flight work stops on
+          failure
+        </li>
         <li>No unbounded goroutines regardless of workload size</li>
       </ul>
     </div>
@@ -45,12 +49,14 @@ Designed for systems where reliability, control, and scalability of background w
     <div class="MarkdownCard">
       <h3 class="MarkdownCardTitle">Execution Model</h3>
       <ul>
-        <li>Job lifecycle:
+        <li>
+          Job lifecycle:
           <ul>
             <li>pending → running → completed / failed</li>
           </ul>
         </li>
-        <li>Batch jobs:
+        <li>
+          Batch jobs:
           <ul>
             <li>- Scan → discover items</li>
             <li>- Chunk → partition workload</li>
@@ -66,7 +72,8 @@ Designed for systems where reliability, control, and scalability of background w
       <h3 class="MarkdownCardTitle">Job Contracts</h3>
       <ul>
         <li><strong>SingleRunJob</strong>: Run(ctx)</li>
-        <li><strong>BatchProcessingJob</strong>:
+        <li>
+          <strong>BatchProcessingJob</strong>:
           <ul>
             <li>- Scan()</li>
             <li>- ChunkSize()</li>
@@ -81,7 +88,8 @@ Designed for systems where reliability, control, and scalability of background w
     <div class="MarkdownCard">
       <h3 class="MarkdownCardTitle">API & CLI</h3>
       <ul>
-        <li>API:
+        <li>
+          API:
           <ul>
             <li>- POST /jobs → submit</li>
             <li>- GET /jobs → list</li>
@@ -89,7 +97,8 @@ Designed for systems where reliability, control, and scalability of background w
             <li>- GET /health → health check</li>
           </ul>
         </li>
-        <li>CLI:
+        <li>
+          CLI:
           <ul>
             <li>- start, shutdown, health</li>
             <li>- submit, status, list</li>
@@ -101,7 +110,7 @@ Designed for systems where reliability, control, and scalability of background w
     </div>
 
     <div class="MarkdownCard">
-        <h3 class="MarkdownCardTitle">Built-in Jobs</h3>
+      <h3 class="MarkdownCardTitle">Built-in Jobs</h3>
       <ul>
         <li>file_encrypt → AES-256-GCM folder encryption</li>
         <li>csv_transform → row-level transformations</li>
@@ -115,6 +124,5 @@ Designed for systems where reliability, control, and scalability of background w
         <li>- precedence: flag → config → fallback</li>
       </ul>
     </div>
-
   </div>
 </div>
