@@ -1,3 +1,4 @@
+/* BootScreen styles define terminal shell layout, responsive behavior, and command output themes. */
 @layer components {
   .Boot {
     --shell-gutter: clamp(0.4rem, 1.25vw, 1rem);

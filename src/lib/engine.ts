@@ -4,8 +4,10 @@ import { COMMANDS } from "./commands";
 import { renderHelpCommand, renderHelpIndex } from "./help";
 import { fetchProjectReadmeHtml, fetchProjectsIndexHtml } from "./projects";
 
+// Output formats supported by the terminal renderer.
 export type OutputMode = "text" | "html";
 
+// Normalized shape returned for every command execution.
 export type EngineResult = {
   output: string;
   outputMode?: OutputMode;
@@ -15,6 +17,7 @@ export type EngineResult = {
   openInNewTab?: boolean;
 };
 
+// Splits raw terminal input into command and positional argument tokens.
 const parseInput = (input: string) => {
   const parts = input.trim().split(/\s+/).filter(Boolean);
   const command = parts[0] ?? "";
@@ -22,16 +25,19 @@ const parseInput = (input: string) => {
   return { command, args };
 };
 
+// Parsed argument container used after flag validation.
 type ParsedArgs = {
   positionals: string[];
   flags: Set<string>;
 };
 
+// Creates a standardized command-scoped error payload.
 const commandError = (commandName: string, message: string): EngineResult => ({
   output: `${commandName}: ${message}\nRun \`help ${commandName}\` for usage.`,
   error: true,
 });
 
+// Validates and normalizes command arguments into positionals and known flags.
 const parseCommandArgs = (
   commandName: string,
   args: string[],
@@ -191,6 +197,7 @@ const parseCommandArgs = (
   return { positionals, flags };
 };
 
+// Main command dispatcher for all terminal commands.
 export const executeCommand = async (input: string): Promise<EngineResult> => {
   const trimmed = input.trim();
   if (!trimmed) return { output: "" };
@@ -198,6 +205,7 @@ export const executeCommand = async (input: string): Promise<EngineResult> => {
   const { command: rawCommand, args } = parseInput(trimmed);
   const command = rawCommand.toLowerCase();
 
+  // Help command: global or per-command docs.
   if (command === "help") {
     const parsed = parseCommandArgs(command, args);
     if ("error" in parsed) return parsed;
@@ -211,6 +219,7 @@ export const executeCommand = async (input: string): Promise<EngineResult> => {
     return { output: renderHelpCommand(parsed.positionals[0].toLowerCase()) };
   }
 
+  // Clear command: resets session output history.
   if (command === "cls") {
     const parsed = parseCommandArgs(command, args);
     if ("error" in parsed) return parsed;
@@ -220,6 +229,7 @@ export const executeCommand = async (input: string): Promise<EngineResult> => {
     return { output: "", clear: true };
   }
 
+  // About command: renders GitHub profile README.
   if (command === "about") {
     const parsed = parseCommandArgs(command, args);
     if ("error" in parsed) return parsed;
@@ -239,6 +249,7 @@ export const executeCommand = async (input: string): Promise<EngineResult> => {
     }
   }
 
+  // Projects command: list repositories or show a specific README.
   if (command === "projects") {
     const parsed = parseCommandArgs(command, args);
     if ("error" in parsed) return parsed;
@@ -273,6 +284,7 @@ export const executeCommand = async (input: string): Promise<EngineResult> => {
     }
   }
 
+  // Blog command: list posts or render a single post body.
   if (command === "blog") {
     const parsed = parseCommandArgs(command, args);
     if ("error" in parsed) return parsed;
@@ -303,6 +315,7 @@ export const executeCommand = async (input: string): Promise<EngineResult> => {
     }
   }
 
+  // Whoami command: renders a neofetch-style identity card.
   if (command === "whoami") {
     const parsed = parseCommandArgs(command, args);
     if ("error" in parsed) return parsed;
@@ -330,6 +343,7 @@ export const executeCommand = async (input: string): Promise<EngineResult> => {
     };
   }
 
+  // Neofetch command: full split layout or compact text mode.
   if (command === "neofetch") {
     const parsed = parseCommandArgs(command, args);
     if ("error" in parsed) return parsed;
@@ -398,6 +412,7 @@ export const executeCommand = async (input: string): Promise<EngineResult> => {
     };
   }
 
+  // Contact command: prints links or opens one destination directly.
   if (command === "contact") {
     const parsed = parseCommandArgs(command, args);
     if ("error" in parsed) return parsed;
@@ -456,6 +471,7 @@ export const executeCommand = async (input: string): Promise<EngineResult> => {
     };
   }
 
+  // Resume command: opens the public resume asset in a new tab.
   if (command === "resume") {
     const parsed = parseCommandArgs(command, args);
     if ("error" in parsed) return parsed;

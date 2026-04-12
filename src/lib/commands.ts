@@ -1,3 +1,4 @@
+// Shared metadata for a single command-line flag.
 export type CommandFlag = {
   long: string;
   short?: string;
@@ -7,6 +8,7 @@ export type CommandFlag = {
   defaultValue?: string;
 };
 
+// Command schema used by help rendering and engine validation.
 export type CommandDefinition = {
   name: string;
   description: string;
@@ -15,6 +17,7 @@ export type CommandDefinition = {
   flags: CommandFlag[];
 };
 
+// Canonical command registry for terminal command routing.
 export const COMMANDS: Record<string, CommandDefinition> = {
   help: {
     name: "help",
@@ -110,4 +113,5 @@ export const COMMANDS: Record<string, CommandDefinition> = {
   },
 };
 
+// Sorted command names used by the help index renderer.
 export const COMMAND_NAMES = Object.keys(COMMANDS).sort();

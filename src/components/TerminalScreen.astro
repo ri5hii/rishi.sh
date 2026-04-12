@@ -77,6 +77,7 @@
       <div id="session-log" class="TerminalLog TerminalLog--session"></div>
 
       <script>
+        // Terminal runtime: handles command execution, rendering, shortcuts, and input UX.
         import { executeCommand } from "../lib/engine";
 
         const log = document.getElementById("boot-log");
@@ -92,6 +93,7 @@
         ) as HTMLSpanElement | null;
         let activeShortcutBlockIndex = -1;
 
+        // Returns true when keyboard focus is already inside a text-editable control.
         const isEditableTarget = (target: EventTarget | null) => {
           if (!(target instanceof HTMLElement)) return false;
           if (target.isContentEditable) return true;
@@ -100,6 +102,7 @@
           return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
         };
 
+        // Focuses the prompt input and moves caret to the end.
         const focusPromptInput = () => {
           if (!promptInput || promptInput.disabled) return;
           promptInput.focus();
@@ -109,6 +112,7 @@
           );
         };
 
+        // Aligns a session block near the top anchor line of the scroll container.
         const alignSessionToNodeStart = (node: HTMLElement) => {
           if (!sessionLog) return;
 
@@ -139,6 +143,7 @@
           sessionLog.scrollTop = Math.max(0, targetTop - anchorOffset);
         };
 
+        // Collects all rendered command result blocks.
         const getSessionBlocks = () => {
           if (!sessionLog) return [] as HTMLElement[];
           return Array.from(
@@ -146,6 +151,7 @@
           ).filter((node): node is HTMLElement => node instanceof HTMLElement);
         };
 
+        // Infers the currently visible block nearest to the configured anchor line.
         const inferCurrentBlockIndex = (blocks: HTMLElement[]) => {
           if (!sessionLog || !blocks.length) return -1;
 
@@ -165,6 +171,7 @@
           return nearestIndex;
         };
 
+        // Moves viewport focus between previous and next output blocks.
         const navigateOutputBlocks = (direction: -1 | 1) => {
           const blocks = getSessionBlocks();
           if (!blocks.length) return false;
@@ -188,6 +195,7 @@
           return true;
         };
 
+        // Global keyboard shortcuts for output navigation and prompt focus.
         document.addEventListener("keydown", (event: KeyboardEvent) => {
           if (event.defaultPrevented || event.repeat) return;
 
@@ -214,11 +222,13 @@
           focusPromptInput();
         });
 
+        // Allows tapping prompt bar chrome to focus the command input.
         promptBar?.addEventListener("pointerdown", (event: Event) => {
           if (isEditableTarget(event.target)) return;
           focusPromptInput();
         });
 
+        // Sanitizes rich html command output before injecting into the terminal DOM.
         const sanitizeHtml = (unsafeHtml: string): string => {
           const template = document.createElement("template");
           template.innerHTML = unsafeHtml;
@@ -316,6 +326,7 @@
           return template.innerHTML;
         };
 
+        // Appends one command+output block and keeps the newest block in view.
         const appendBlock = (
           command: string,
           output: string,
@@ -377,12 +388,14 @@
           requestAnimationFrame(() => alignSessionToNodeStart(block));
         };
 
+        // Clears all rendered session output blocks.
         const clearSession = () => {
           if (!sessionLog) return;
           activeShortcutBlockIndex = -1;
           sessionLog.innerHTML = "";
         };
 
+        // Replays the boot animation typing sequence before interactive mode.
         const runBootSequence = async (bootLogEl: HTMLElement | null) => {
           if (!bootLogEl) return;
 
@@ -436,6 +449,7 @@
           }
         };
 
+        // Wires prompt input behavior for history, autocomplete, and command execution.
         const initPromptSession = (
           inputEl: HTMLInputElement | null,
           bootLogEl: HTMLElement | null,
@@ -451,17 +465,20 @@
           let autocompleteCursor = -1;
           const bootRoot = document.querySelector(".Boot");
 
+          // Resets cursor state used by ArrowUp/ArrowDown history traversal.
           const resetHistoryNavigation = () => {
             historyCursor = -1;
             historyDraft = "";
           };
 
+          // Resets Tab cycling state used by history autocomplete.
           const resetAutocompleteNavigation = () => {
             autocompleteSeed = "";
             autocompleteMatches = [];
             autocompleteCursor = -1;
           };
 
+          // Computes unique recent history matches for a typed prefix.
           const getHistoryAutocompleteMatches = (seed: string) => {
             const prefix = seed.trim();
             const uniqueRecentMatches: string[] = [];
@@ -479,11 +496,13 @@
             return uniqueRecentMatches;
           };
 
+          // Updates the ghosted autocomplete preview text shown behind the input.
           const setAutocompletePreview = (value: string) => {
             if (!promptAutocompletePreview) return;
             promptAutocompletePreview.textContent = value;
           };
 
+          // Refreshes preview content from the best current history candidate.
           const updateAutocompletePreview = () => {
             const seed = inputEl.value.trim();
             if (!seed) {
@@ -500,6 +519,7 @@
             setAutocompletePreview(candidate);
           };
 
+          // Sets input value and keeps caret pinned to the end.
           const setInputValue = (value: string) => {
             inputEl.value = value;
             inputEl.setSelectionRange(value.length, value.length);
@@ -632,6 +652,7 @@
           });
         };
 
+        // Bootstraps disabled prompt state, boot animation, then interactive mode.
         (async () => {
           if (!log) {
             console.warn(
