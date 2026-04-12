@@ -1,5 +1,14 @@
 const GITHUB_USERNAME = "ri5hii";
 
+// Add repository names here to hide them from `projects` listing/details.
+const EXCLUDED_REPO_NAMES: string[] = ["zinnia"];
+const EXCLUDED_REPO_SET = new Set(
+  EXCLUDED_REPO_NAMES.map((name) => name.trim().toLowerCase()).filter(Boolean),
+);
+
+const isRepoExcluded = (repoName: string) =>
+  EXCLUDED_REPO_SET.has(repoName.trim().toLowerCase());
+
 type RepoSummary = {
   name: string;
   html_url: string;
@@ -143,14 +152,14 @@ const fetchRepos = async (): Promise<RepoSummary[]> => {
 export const fetchProjectsIndexHtml = async (
   includeAll = false,
 ): Promise<string> => {
-  const cacheKey = includeAll ? "all" : "default";
+  const exclusionKey = Array.from(EXCLUDED_REPO_SET).sort().join(",");
+  const cacheKey = `${includeAll ? "all" : "default"}:${exclusionKey}`;
   const cached = projectIndexCache.get(cacheKey);
   if (cached) return cached;
 
   const repos = await fetchRepos();
-  const filtered = includeAll
-    ? repos
-    : repos.filter((repo) => !repo.fork && !repo.archived);
+  const filtered = (includeAll ? repos : repos.filter((repo) => !repo.archived))
+    .filter((repo) => !isRepoExcluded(repo.name));
 
   const items = filtered
     .slice(0, 12)
@@ -180,6 +189,10 @@ export const fetchProjectReadmeHtml = async (
     throw new Error(
       "Please provide a repository name. Example: projects rishi.sh",
     );
+  }
+
+  if (isRepoExcluded(normalized)) {
+    throw new Error(`Repository is excluded by local config: ${normalized}`);
   }
 
   const cacheKey = normalized.toLowerCase();

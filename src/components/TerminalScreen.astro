@@ -130,7 +130,8 @@
             targetTop = sessionLog.scrollTop + (nodeRect.top - containerRect.top);
           }
 
-          sessionLog.scrollTop = Math.max(0, targetTop);
+          const anchorOffset = sessionLog.clientHeight * 0.25;
+          sessionLog.scrollTop = Math.max(0, targetTop - anchorOffset);
         };
 
         document.addEventListener("keydown", (event: KeyboardEvent) => {
@@ -439,6 +440,7 @@
               id="prompt-input"
               class="PromptInput"
               type="text"
+              placeholder="Type a command here..."
               autocomplete="off"
               autocapitalize="off"
               spellcheck="false"
