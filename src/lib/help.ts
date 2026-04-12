@@ -16,7 +16,13 @@ const renderFlags = (flags: CommandDefinition["flags"]) => {
 };
 
 const renderShortcuts = () =>
-  ["Shortcuts:", "  Ctrl+I (Cmd+I)  Focus prompt input"].join("\n");
+  [
+    "Shortcuts:",
+    "  Ctrl+I (Cmd+I)  Focus prompt input",
+    "  Alt+ArrowUp  Jump to previous command output block",
+    "  Alt+ArrowDown  Jump to next command output block",
+    "  ArrowUp/ArrowDown  Default scrolling/navigation (no jump)",
+  ].join("\n");
 
 export const renderHelpIndex = () => {
   const nameCol = Math.max(...COMMAND_NAMES.map((n) => n.length), 7);

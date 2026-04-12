@@ -87,6 +87,7 @@
         const promptInput = document.getElementById(
           "prompt-input",
         ) as HTMLInputElement | null;
+        let activeShortcutBlockIndex = -1;
 
         const isEditableTarget = (target: EventTarget | null) => {
           if (!(target instanceof HTMLElement)) return false;
@@ -134,8 +135,70 @@
           sessionLog.scrollTop = Math.max(0, targetTop - anchorOffset);
         };
 
+        const getSessionBlocks = () => {
+          if (!sessionLog) return [] as HTMLElement[];
+          return Array.from(sessionLog.querySelectorAll(".SessionBlock")).filter(
+            (node): node is HTMLElement => node instanceof HTMLElement,
+          );
+        };
+
+        const inferCurrentBlockIndex = (blocks: HTMLElement[]) => {
+          if (!sessionLog || !blocks.length) return -1;
+
+          const anchorLine = sessionLog.scrollTop + sessionLog.clientHeight * 0.25;
+          let nearestIndex = 0;
+          let nearestDistance = Number.POSITIVE_INFINITY;
+
+          for (let index = 0; index < blocks.length; index++) {
+            const distance = Math.abs(blocks[index].offsetTop - anchorLine);
+            if (distance < nearestDistance) {
+              nearestDistance = distance;
+              nearestIndex = index;
+            }
+          }
+
+          return nearestIndex;
+        };
+
+        const navigateOutputBlocks = (direction: -1 | 1) => {
+          const blocks = getSessionBlocks();
+          if (!blocks.length) return false;
+
+          if (
+            activeShortcutBlockIndex < 0 ||
+            activeShortcutBlockIndex >= blocks.length
+          ) {
+            activeShortcutBlockIndex = inferCurrentBlockIndex(blocks);
+          }
+
+          const targetIndex = Math.min(
+            blocks.length - 1,
+            Math.max(0, activeShortcutBlockIndex + direction),
+          );
+
+          activeShortcutBlockIndex = targetIndex;
+          const targetBlock = blocks[targetIndex];
+          alignSessionToNodeStart(targetBlock);
+          requestAnimationFrame(() => alignSessionToNodeStart(targetBlock));
+          return true;
+        };
+
         document.addEventListener("keydown", (event: KeyboardEvent) => {
           if (event.defaultPrevented || event.repeat) return;
+
+          const isAltBlockNavigation =
+            event.altKey &&
+            !event.ctrlKey &&
+            !event.metaKey &&
+            !event.shiftKey &&
+            (event.key === "ArrowUp" || event.key === "ArrowDown");
+
+          if (isAltBlockNavigation) {
+            const direction = event.key === "ArrowUp" ? -1 : 1;
+            const handled = navigateOutputBlocks(direction);
+            if (handled) event.preventDefault();
+            return;
+          }
 
           const isFocusShortcut =
             (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "i";
@@ -290,12 +353,15 @@
           block.appendChild(outputNode);
           sessionLog.appendChild(block);
 
+          activeShortcutBlockIndex = getSessionBlocks().length - 1;
+
           alignSessionToNodeStart(block);
           requestAnimationFrame(() => alignSessionToNodeStart(block));
         };
 
         const clearSession = () => {
           if (!sessionLog) return;
+          activeShortcutBlockIndex = -1;
           sessionLog.innerHTML = "";
         };
 
