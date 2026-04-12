@@ -22,6 +22,7 @@ const renderShortcuts = () =>
     "  Alt+ArrowUp  Jump to previous command output block",
     "  Alt+ArrowDown  Jump to next command output block",
     "  ArrowUp/ArrowDown  Command history (when prompt is focused)",
+    "  Tab/Shift+Tab  History autocomplete cycle (when prompt is focused)",
   ].join("\n");
 
 export const renderHelpIndex = () => {

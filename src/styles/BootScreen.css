@@ -498,6 +498,23 @@
     font-size: clamp(0.8rem, 1.45vw, 1rem);
   }
 
+  .PromptInputWrap {
+    @apply relative flex-1 min-w-0;
+    margin-left: 1ch;
+  }
+
+  .PromptAutocompletePreview {
+    @apply absolute inset-y-0 left-0 flex items-center select-none;
+    @apply text-[#dfe2eb]/32 font-mono pointer-events-none;
+    width: 100%;
+    font-size: clamp(0.8rem, 1.45vw, 1rem);
+    line-height: 1.45;
+    white-space: pre;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    z-index: 0;
+  }
+
   .PromptPrefix {
     @apply inline-flex items-center gap-2;
     min-width: 0;
@@ -527,11 +544,24 @@
     min-width: 0;
     width: 100%;
     caret-color: #a2c9ff;
-    margin-left: 1ch;
+    margin-left: 0;
+    position: relative;
+    z-index: 1;
   }
 
   .PromptInput::placeholder {
-    color: rgba(223, 226, 235, 0.4);
+    color: rgba(223, 226, 235, 0.55);
+    opacity: 1;
+  }
+
+  .PromptInput::-webkit-input-placeholder {
+    color: rgba(223, 226, 235, 0.55);
+    opacity: 1;
+  }
+
+  .PromptInput::-moz-placeholder {
+    color: rgba(223, 226, 235, 0.55);
+    opacity: 1;
   }
 
   .PromptInput:disabled {
