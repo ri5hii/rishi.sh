@@ -265,10 +265,15 @@
           const isSafeUrl = (url: string) => {
             const trimmed = url.trim();
             if (!trimmed) return false;
+
+            const isSameOriginAbsolutePath =
+              trimmed.startsWith("/") && !trimmed.startsWith("//");
+
             return (
               trimmed.startsWith("https://") ||
               trimmed.startsWith("http://") ||
-              trimmed.startsWith("mailto:")
+              trimmed.startsWith("mailto:") ||
+              isSameOriginAbsolutePath
             );
           };
 
@@ -319,6 +324,11 @@
         ) => {
           if (!sessionLog) return;
 
+          const normalizedCommand = command.trim().toLowerCase();
+          const isNeofetchOutput =
+            normalizedCommand === "neofetch" ||
+            normalizedCommand.startsWith("neofetch ");
+
           const block = document.createElement("div");
           block.className = "SessionBlock";
 
@@ -350,6 +360,9 @@
             outputPre.className = isError
               ? "SessionOutput SessionOutput--error"
               : "SessionOutput";
+            if (isNeofetchOutput) {
+              outputPre.classList.add("SessionOutput--neofetch");
+            }
             outputPre.textContent = output;
             outputNode = outputPre;
           }
@@ -657,8 +670,7 @@
               <span
                 id="prompt-autocomplete-preview"
                 class="PromptAutocompletePreview"
-                aria-hidden="true"
-              ></span>
+                aria-hidden="true"></span>
               <input
                 id="prompt-input"
                 class="PromptInput"

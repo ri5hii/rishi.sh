@@ -353,6 +353,17 @@
     margin: 0;
   }
 
+  .SessionOutput--neofetch {
+    white-space: pre;
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-width: 100%;
+    display: block;
+    line-height: 1.25;
+    font-size: clamp(0.68rem, 1.2vw, 0.94rem);
+    -webkit-overflow-scrolling: touch;
+  }
+
   .SessionOutputRich {
     @apply mt-2 text-[#dfe2eb];
     font-size: clamp(0.78rem, 1.4vw, 1rem);
@@ -434,6 +445,99 @@
     display: inline-block;
     max-width: none;
     height: 20px;
+  }
+
+  .SessionOutputRich .NeofetchSplit {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: 0.25rem 1.2rem;
+    max-width: 100%;
+  }
+
+  .SessionOutputRich .NeofetchSplit pre {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    line-height: 1.25;
+    white-space: pre;
+    overflow: visible;
+  }
+
+  .SessionOutputRich .NeofetchLogo {
+    color: #dfe2eb;
+  }
+
+  .SessionOutputRich .NeofetchInfo {
+    color: #dfe2eb;
+    min-width: 0;
+  }
+
+  .SessionOutputRich .WhoamiNeo {
+    --whoami-line-height: 1.45em;
+    --whoami-line-count: 8;
+    --whoami-square-size: calc(
+      var(--whoami-line-count) * var(--whoami-line-height)
+    );
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, var(--whoami-square-size));
+    align-items: start;
+    gap: clamp(0.65rem, 2vw, 1rem);
+  }
+
+  .SessionOutputRich .WhoamiNeoMeta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.18rem;
+    min-width: 0;
+    line-height: var(--whoami-line-height);
+  }
+
+  .SessionOutputRich .WhoamiNeoTitle {
+    color: #a2c9ff;
+    font-weight: 600;
+  }
+
+  .SessionOutputRich .WhoamiNeoRule {
+    color: rgba(223, 226, 235, 0.46);
+    letter-spacing: 0.02em;
+  }
+
+  .SessionOutputRich .WhoamiNeoRow {
+    display: grid;
+    grid-template-columns: 8ch 1ch minmax(0, 1fr);
+    align-items: baseline;
+    column-gap: 0.35rem;
+  }
+
+  .SessionOutputRich .WhoamiNeoKey {
+    color: #58a6ff;
+  }
+
+  .SessionOutputRich .WhoamiNeoSep {
+    color: rgba(223, 226, 235, 0.5);
+    text-align: center;
+  }
+
+  .SessionOutputRich .WhoamiNeoValue {
+    color: #dfe2eb;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .SessionOutputRich .WhoamiAvatar {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    inline-size: min(100%, var(--whoami-square-size));
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 0;
+    border: 1px solid rgba(162, 201, 255, 0.28);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+    place-self: start center;
   }
 
   .SessionOutputRich table {
@@ -591,6 +695,27 @@
       margin-top: 0.72rem;
       margin-bottom: 0.35rem;
     }
+
+    .SessionOutputRich .WhoamiNeo {
+      --whoami-line-height: 1.35em;
+      grid-template-columns: minmax(0, 1fr) minmax(0, var(--whoami-square-size));
+      gap: 0.7rem;
+    }
+
+    .SessionOutputRich .WhoamiNeoRow {
+      grid-template-columns: 7ch 1ch minmax(0, 1fr);
+    }
+
+    .SessionOutputRich .NeofetchSplit {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
+
+    .SessionOutputRich .NeofetchLogo,
+    .SessionOutputRich .NeofetchInfo {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
   }
 
   @media (max-width: 540px) {
@@ -635,6 +760,22 @@
 
     .ButtonIndicator {
       font-size: 0.72rem;
+    }
+
+    .SessionOutputRich .WhoamiNeo {
+      --whoami-line-height: 1.25em;
+      grid-template-columns: minmax(0, 1fr) minmax(0, var(--whoami-square-size));
+      gap: 0.55rem;
+    }
+
+    .SessionOutputRich .WhoamiNeoRow {
+      grid-template-columns: 6.5ch 1ch minmax(0, 1fr);
+      column-gap: 0.25rem;
+    }
+
+    .SessionOutput--neofetch {
+      font-size: 0.72rem;
+      line-height: 1.2;
     }
   }
 

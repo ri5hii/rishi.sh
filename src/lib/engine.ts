@@ -311,8 +311,22 @@ export const executeCommand = async (input: string): Promise<EngineResult> => {
     }
 
     return {
-      output:
-        "Hrishikesh Vadla\nAI/ML + cybersecurity builder focused on secure intelligent systems.",
+      outputMode: "html",
+      output: [
+        '<div class="WhoamiNeo">',
+        '  <div class="WhoamiNeoMeta">',
+        '    <div class="WhoamiNeoTitle">rishi@rishi.sh</div>',
+        '    <div class="WhoamiNeoRule">--------------</div>',
+        '    <div class="WhoamiNeoRow"><span class="WhoamiNeoKey">name</span><span class="WhoamiNeoSep">:</span><span class="WhoamiNeoValue">Hrishikesh Vadla</span></div>',
+        '    <div class="WhoamiNeoRow"><span class="WhoamiNeoKey">focus</span><span class="WhoamiNeoSep">:</span><span class="WhoamiNeoValue">AI/ML + Cybersecurity</span></div>',
+        '    <div class="WhoamiNeoRow"><span class="WhoamiNeoKey">stack</span><span class="WhoamiNeoSep">:</span><span class="WhoamiNeoValue">Python, Rust, Go</span></div>',
+        '    <div class="WhoamiNeoRow"><span class="WhoamiNeoKey">tools</span><span class="WhoamiNeoSep">:</span><span class="WhoamiNeoValue">FastAPI, Docker, AWS</span></div>',
+        '    <div class="WhoamiNeoRow"><span class="WhoamiNeoKey">status</span><span class="WhoamiNeoSep">:</span><span class="WhoamiNeoValue">Building secure intelligent systems</span></div>',
+        '    <div class="WhoamiNeoRow"><span class="WhoamiNeoKey">site</span><span class="WhoamiNeoSep">:</span><span class="WhoamiNeoValue">rishi.sh</span></div>',
+        "  </div>",
+        '  <img class="WhoamiAvatar" src="/image.png" alt="Portrait of myself" width="128" height="128" />',
+        "</div>",
+      ].join(""),
     };
   }
 
@@ -339,27 +353,47 @@ export const executeCommand = async (input: string): Promise<EngineResult> => {
       };
     }
 
+    const neofetchLogo = [
+      "                  .',;::::;,'..",
+      "             .';:cccccccccccc:;,.",
+      "          .;cccccccccccccccccccccc;.",
+      "        .:cccccccccccccccccccccccccc:.",
+      "      .;ccccccccccccc;.:dddl:.;ccccccc;.",
+      "     .:ccccccccccccc;OWMKOOXMWd;ccccccc:.",
+      "    .:ccccccccccccc;KMMc;cc;xMMc;ccccccc:.",
+      "    ,cccccccccccccc;MMM.;cc;;WW:;cccccccc,",
+      "    :cccccccccccccc;MMM.;cccccccccccccccc:",
+      "    :ccccccc;oxOOOo;MMM000k.;cccccccccccc:",
+      "    cccccc;0MMKxdd:;MMMkddc.;cccccccccccc;",
+      "    ccccc;XMO';cccc;MMM.;cccccccccccccccc'",
+      "    ccccc;MMo;ccccc;MMW.;ccccccccccccccc;",
+      "    ccccc;0MNc.ccc.xMMd;ccccccccccccccc;",
+      "    cccccc;dNMWXXXWM0:;cccccccccccccc:,",
+      "    cccccccc;.:odl:.;cccccccccccccc:,.",
+      "    cccccccccccccccccccccccccccccc:'",
+      "    :ccccccccccccccccccccccc:;,..",
+      "     ':cccccccccccccccc::;,.",
+    ];
+
+    const neofetchInfo = [
+      "rishi.sh",
+      "--------",
+      "name      : Hrishikesh Vadla",
+      "focus     : AI/ML + Cybersecurity",
+      "stack     : Python, Rust, Go",
+      "tools     : FastAPI, Docker, AWS",
+      "interests : Adversarial defense,",
+      "            LLM systems, DevSecOps",
+      "quote     : secure intelligence",
+    ];
+
     return {
+      outputMode: "html",
       output: [
-        "                  .',;::::;,'..                     rishi.sh",
-        "             .';:cccccccccccc:;,.                   --------",
-        "          .;cccccccccccccccccccccc;.                name      : Hrishikesh Vadla",
-        "        .:cccccccccccccccccccccccccc:.              focus     : AI/ML + Cybersecurity",
-        "      .;ccccccccccccc;.:dddl:.;ccccccc;.            stack     : Python, Rust, Go",
-        "     .:ccccccccccccc;OWMKOOXMWd;ccccccc:.           tools     : FastAPI, Docker, AWS",
-        "    .:ccccccccccccc;KMMc;cc;xMMc;ccccccc:.          interests : Adversarial defense,",
-        "    ,cccccccccccccc;MMM.;cc;;WW:;cccccccc,                       LLM systems, DevSecOps",
-        "    :cccccccccccccc;MMM.;cccccccccccccccc:          quote     : secure intelligence",
-        "    :ccccccc;oxOOOo;MMM000k.;cccccccccccc:",
-        "    cccccc;0MMKxdd:;MMMkddc.;cccccccccccc;",
-        "    ccccc;XMO';cccc;MMM.;cccccccccccccccc'",
-        "    ccccc;MMo;ccccc;MMW.;ccccccccccccccc;",
-        "    ccccc;0MNc.ccc.xMMd;ccccccccccccccc;",
-        "    cccccc;dNMWXXXWM0:;cccccccccccccc:,",
-        "    cccccccc;.:odl:.;cccccccccccccc:,.",
-        "    cccccccccccccccccccccccccccccc:'.",
-        "    :ccccccccccccccccccccccc:;,..",
-        "     ':cccccccccccccccc::;,.",
+        '<div class="NeofetchSplit">',
+        `  <pre class="NeofetchLogo">${neofetchLogo.join("\n")}</pre>`,
+        `  <pre class="NeofetchInfo">${neofetchInfo.join("\n")}</pre>`,
+        "</div>",
       ].join("\n"),
     };
   }
