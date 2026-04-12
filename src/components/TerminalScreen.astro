@@ -128,7 +128,8 @@
           if (!foundSessionAncestor) {
             const containerRect = sessionLog.getBoundingClientRect();
             const nodeRect = node.getBoundingClientRect();
-            targetTop = sessionLog.scrollTop + (nodeRect.top - containerRect.top);
+            targetTop =
+              sessionLog.scrollTop + (nodeRect.top - containerRect.top);
           }
 
           const anchorOffset = sessionLog.clientHeight * 0.25;
@@ -137,15 +138,16 @@
 
         const getSessionBlocks = () => {
           if (!sessionLog) return [] as HTMLElement[];
-          return Array.from(sessionLog.querySelectorAll(".SessionBlock")).filter(
-            (node): node is HTMLElement => node instanceof HTMLElement,
-          );
+          return Array.from(
+            sessionLog.querySelectorAll(".SessionBlock"),
+          ).filter((node): node is HTMLElement => node instanceof HTMLElement);
         };
 
         const inferCurrentBlockIndex = (blocks: HTMLElement[]) => {
           if (!sessionLog || !blocks.length) return -1;
 
-          const anchorLine = sessionLog.scrollTop + sessionLog.clientHeight * 0.25;
+          const anchorLine =
+            sessionLog.scrollTop + sessionLog.clientHeight * 0.25;
           let nearestIndex = 0;
           let nearestDistance = Number.POSITIVE_INFINITY;
 
@@ -425,14 +427,65 @@
           if (!inputEl) return;
 
           let hasEnteredSessionMode = false;
+          const commandHistory: string[] = [];
+          let historyCursor = -1;
+          let historyDraft = "";
           const bootRoot = document.querySelector(".Boot");
 
+          const resetHistoryNavigation = () => {
+            historyCursor = -1;
+            historyDraft = "";
+          };
+
+          const setInputValue = (value: string) => {
+            inputEl.value = value;
+            inputEl.setSelectionRange(value.length, value.length);
+          };
+
+          inputEl.addEventListener("input", () => {
+            if (historyCursor !== -1) {
+              historyCursor = -1;
+              historyDraft = inputEl.value;
+            }
+          });
+
           inputEl.addEventListener("keydown", async (e: KeyboardEvent) => {
+            if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+              if (!commandHistory.length) return;
+              e.preventDefault();
+
+              if (historyCursor === -1) {
+                historyDraft = inputEl.value;
+                historyCursor = commandHistory.length;
+              }
+
+              if (e.key === "ArrowUp") {
+                historyCursor = Math.max(0, historyCursor - 1);
+                setInputValue(commandHistory[historyCursor] ?? "");
+                return;
+              }
+
+              historyCursor = Math.min(
+                commandHistory.length,
+                historyCursor + 1,
+              );
+              if (historyCursor === commandHistory.length) {
+                setInputValue(historyDraft);
+                resetHistoryNavigation();
+              } else {
+                setInputValue(commandHistory[historyCursor] ?? "");
+              }
+              return;
+            }
+
             if (e.key !== "Enter") return;
             e.preventDefault();
 
             const raw = inputEl.value.trim();
             if (!raw) return;
+
+            commandHistory.push(raw);
+            resetHistoryNavigation();
 
             if (!hasEnteredSessionMode) {
               hasEnteredSessionMode = true;

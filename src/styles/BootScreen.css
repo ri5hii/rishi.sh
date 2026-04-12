@@ -206,10 +206,10 @@
   }
 
   .TerminalWindow {
-      @apply w-full max-w-none h-full min-h-0 relative overflow-hidden
+    @apply w-full max-w-none h-full min-h-0 relative overflow-hidden
         bg-[#181c22] rounded-none border-y border-[#dfe2eb]/10 border-x-0
         shadow-[0_32px_64px_-12px_rgba(162,201,255,0.05)] flex flex-col;
-      padding: clamp(0.9rem, 2.1vw, 1.5rem);
+    padding: clamp(0.9rem, 2.1vw, 1.5rem);
   }
 
   /* Boot mode compact card */
@@ -457,7 +457,9 @@
     padding-left: clamp(0.65rem, 2.8vw, 1.5rem);
     padding-right: clamp(0.65rem, 2.8vw, 1.5rem);
     padding-top: clamp(0.4rem, 1.6vh, 0.95rem);
-    padding-bottom: calc(clamp(0.42rem, 1.3vh, 0.82rem) + env(safe-area-inset-bottom));
+    padding-bottom: calc(
+      clamp(0.42rem, 1.3vh, 0.82rem) + env(safe-area-inset-bottom)
+    );
     border-top-width: 1px;
   }
 
@@ -467,10 +469,7 @@
     left: var(--shell-gutter);
     right: auto;
     width: calc(100% - (var(--shell-gutter) * 2));
-    border-radius: clamp(0.35rem, 1vw, 0.5rem)
-      clamp(0.35rem, 1vw, 0.5rem)
-      0
-      0;
+    border-radius: clamp(0.35rem, 1vw, 0.5rem) clamp(0.35rem, 1vw, 0.5rem) 0 0;
     padding-left: 0;
     padding-right: 0;
   }
@@ -590,7 +589,8 @@
     .Boot--session .PromptBar {
       left: max(0.35rem, env(safe-area-inset-left));
       width: calc(
-        100% - max(0.35rem, env(safe-area-inset-left)) - max(0.35rem, env(safe-area-inset-right))
+        100% - max(0.35rem, env(safe-area-inset-left)) -
+          max(0.35rem, env(safe-area-inset-right))
       );
     }
 

@@ -21,7 +21,7 @@ const renderShortcuts = () =>
     "  Ctrl+I (Cmd+I)  Focus prompt input",
     "  Alt+ArrowUp  Jump to previous command output block",
     "  Alt+ArrowDown  Jump to next command output block",
-    "  ArrowUp/ArrowDown  Default scrolling/navigation (no jump)",
+    "  ArrowUp/ArrowDown  Command history (when prompt is focused)",
   ].join("\n");
 
 export const renderHelpIndex = () => {

@@ -158,8 +158,9 @@ export const fetchProjectsIndexHtml = async (
   if (cached) return cached;
 
   const repos = await fetchRepos();
-  const filtered = (includeAll ? repos : repos.filter((repo) => !repo.archived))
-    .filter((repo) => !isRepoExcluded(repo.name));
+  const filtered = (
+    includeAll ? repos : repos.filter((repo) => !repo.archived)
+  ).filter((repo) => !isRepoExcluded(repo.name));
 
   const items = filtered
     .slice(0, 12)

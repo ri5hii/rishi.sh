@@ -2,46 +2,46 @@
 
 /* Base styles applied globally across the site. */
 @layer base {
-    :root {
-        color-scheme: dark;
-    }
+  :root {
+    color-scheme: dark;
+  }
 
-    *,
-    *::before,
-    *::after {
-        box-sizing: border-box;
-    }
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
 
-    html,
-    body {
-        height: 100%;
-    }
+  html,
+  body {
+    height: 100%;
+  }
 
-    body {
-        background-color: #10141a;
-        color: #dfe2eb;
-        overflow-x: hidden;
-        font-family:
-            "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
-            Consolas, "Liberation Mono", "Courier New", monospace;
-    }
+  body {
+    background-color: #10141a;
+    color: #dfe2eb;
+    overflow-x: hidden;
+    font-family:
+      "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+      "Liberation Mono", "Courier New", monospace;
+  }
 }
 
 /* Small reusable utilities not covered by Tailwind defaults. */
 @layer utilities {
-    .cursor-blink {
-        display: inline-block;
-        width: 10px;
-        height: 1.2em;
-        background-color: #a2c9ff;
-        vertical-align: middle;
-        margin-left: 4px;
-    }
+  .cursor-blink {
+    display: inline-block;
+    width: 10px;
+    height: 1.2em;
+    background-color: #a2c9ff;
+    vertical-align: middle;
+    margin-left: 4px;
+  }
 
-    .ascii-art {
-        line-height: 1.1;
-        white-space: pre;
-    }
+  .ascii-art {
+    line-height: 1.1;
+    white-space: pre;
+  }
 }
 
 /* Component-level styles. */
