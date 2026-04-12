@@ -1,8 +1,10 @@
 import { COMMANDS, COMMAND_NAMES, type CommandDefinition } from "./commands";
 
+// Pads command names so help index columns line up in monospace output.
 const pad = (value: string, width: number) =>
   value.length >= width ? value : value + " ".repeat(width - value.length);
 
+// Renders command flag metadata into a terminal-friendly text block.
 const renderFlags = (flags: CommandDefinition["flags"]) => {
   if (!flags.length) return "Flags:\n  (none)";
   const rows = flags.map((f) => {
@@ -15,6 +17,18 @@ const renderFlags = (flags: CommandDefinition["flags"]) => {
   return ["Flags:", ...rows].join("\n");
 };
 
+// Renders all keyboard shortcut hints shown in help output.
+const renderShortcuts = () =>
+  [
+    "Shortcuts:",
+    "  Ctrl+I (Cmd+I)  Focus prompt input",
+    "  Alt+ArrowUp  Jump to previous command output block",
+    "  Alt+ArrowDown  Jump to next command output block",
+    "  ArrowUp/ArrowDown  Command history (when prompt is focused)",
+    "  Tab/Shift+Tab  History autocomplete cycle (when prompt is focused)",
+  ].join("\n");
+
+// Builds the top-level command index shown for the base help command.
 export const renderHelpIndex = () => {
   const nameCol = Math.max(...COMMAND_NAMES.map((n) => n.length), 7);
   const lines = [
@@ -22,15 +36,18 @@ export const renderHelpIndex = () => {
     "",
     `${pad("COMMAND", nameCol)}  DESCRIPTION`,
     `${"-".repeat(nameCol)}  ${"-".repeat(42)}`,
-    ...COMMAND_NAMES.map((name) =>
-      `${pad(name, nameCol)}  ${COMMANDS[name].description}`
+    ...COMMAND_NAMES.map(
+      (name) => `${pad(name, nameCol)}  ${COMMANDS[name].description}`,
     ),
+    "",
+    renderShortcuts(),
     "",
     "Run `help <command>` for detailed usage.",
   ];
   return lines.join("\n");
 };
 
+// Builds detailed help text for a single command name.
 export const renderHelpCommand = (commandName: string) => {
   const cmd = COMMANDS[commandName];
   if (!cmd) {
@@ -50,6 +67,10 @@ export const renderHelpCommand = (commandName: string) => {
     "Examples:",
     ...cmd.examples.map((e) => `  ${e}`),
   ];
+
+  if (cmd.name === "help") {
+    sections.push("", renderShortcuts());
+  }
 
   return sections.join("\n");
 };

@@ -1,11 +1,14 @@
+// Fallback raw README URLs for the profile repository.
 const ABOUT_README_URLS = [
   "https://raw.githubusercontent.com/ri5hii/ri5hii/main/README.md",
   "https://raw.githubusercontent.com/ri5hii/ri5hii/master/README.md",
 ];
 
+// In-memory caches to avoid repeated network fetches per session.
 let aboutMarkdownCache: string | null = null;
 let aboutHtmlCache: string | null = null;
 
+// Fetches the profile README markdown using ordered URL fallbacks.
 export const fetchAboutReadme = async (): Promise<string> => {
   if (aboutMarkdownCache) return aboutMarkdownCache;
 
@@ -27,6 +30,7 @@ export const fetchAboutReadme = async (): Promise<string> => {
   throw new Error("Unable to fetch profile README from GitHub right now.");
 };
 
+// Escapes raw text so markdown fallback can be displayed safely in HTML.
 const escapeHtml = (value: string) =>
   value
     .replaceAll("&", "&amp;")
@@ -35,6 +39,7 @@ const escapeHtml = (value: string) =>
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
 
+// Renders profile markdown to HTML via GitHub API with a safe preformatted fallback.
 export const fetchAboutRenderedHtml = async (): Promise<string> => {
   if (aboutHtmlCache) return aboutHtmlCache;
 

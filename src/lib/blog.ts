@@ -1,3 +1,4 @@
+// Blog post metadata contract loaded from public blog index.
 type BlogPost = {
   id: number;
   slug: string;
@@ -7,14 +8,17 @@ type BlogPost = {
   file: string;
 };
 
+// Repo context used by GitHub markdown renderer for relative links.
 const BLOG_CONTEXT_REPO = "rishi.sh";
 
+// Session caches for index pages, individual post html, and markdown content.
 const indexCache = new Map<string, string>();
 const postHtmlCache = new Map<string, string>();
 const postMarkdownCache = new Map<string, string>();
 
 let blogPostsCache: BlogPost[] | null = null;
 
+// Escapes raw text so fallback markdown rendering remains safe.
 const escapeHtml = (value: string) =>
   value
     .replaceAll("&", "&amp;")
@@ -23,6 +27,7 @@ const escapeHtml = (value: string) =>
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
 
+// Renders markdown to HTML with GitHub API and falls back to preformatted text.
 const renderMarkdownToHtml = async (markdown: string): Promise<string> => {
   try {
     const response = await fetch("https://api.github.com/markdown", {
@@ -53,6 +58,7 @@ const renderMarkdownToHtml = async (markdown: string): Promise<string> => {
   }
 };
 
+// Normalizes and validates loose json payloads into BlogPost records.
 const normalizeBlogPost = (item: Partial<BlogPost>): BlogPost | null => {
   if (
     typeof item.id !== "number" ||
@@ -81,6 +87,7 @@ const normalizeBlogPost = (item: Partial<BlogPost>): BlogPost | null => {
   };
 };
 
+// Loads, validates, and sorts all posts from the static blog index.
 const fetchBlogPosts = async (): Promise<BlogPost[]> => {
   if (blogPostsCache) return blogPostsCache;
 
@@ -121,6 +128,7 @@ const fetchBlogPosts = async (): Promise<BlogPost[]> => {
   return parsed;
 };
 
+// Fetches markdown source for a specific post and memoizes the result.
 const fetchBlogMarkdown = async (post: BlogPost): Promise<string> => {
   const cacheKey = post.slug.toLowerCase();
   const cached = postMarkdownCache.get(cacheKey);
@@ -146,6 +154,7 @@ const fetchBlogMarkdown = async (post: BlogPost): Promise<string> => {
   return markdown;
 };
 
+// Formats ISO date strings for terminal display.
 const formatDate = (isoDate: string) => {
   const date = new Date(`${isoDate}T00:00:00Z`);
   return new Intl.DateTimeFormat("en-US", {
@@ -155,6 +164,7 @@ const formatDate = (isoDate: string) => {
   }).format(date);
 };
 
+// Resolves either numeric id or slug to a known blog post.
 const resolvePost = (identifier: string) => {
   const trimmed = identifier.trim().toLowerCase();
   if (!trimmed) return null;
@@ -170,6 +180,7 @@ const resolvePost = (identifier: string) => {
   });
 };
 
+// Builds the blog listing page shown for the base blog command.
 export const fetchBlogIndexHtml = async (): Promise<string> => {
   const cacheKey = "index";
   const cached = indexCache.get(cacheKey);
@@ -194,6 +205,7 @@ export const fetchBlogIndexHtml = async (): Promise<string> => {
   return html;
 };
 
+// Builds a rendered blog post page from markdown by id or slug.
 export const fetchBlogPostHtml = async (
   identifier: string,
 ): Promise<string> => {

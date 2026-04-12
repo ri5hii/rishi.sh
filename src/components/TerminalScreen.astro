@@ -77,14 +77,158 @@
       <div id="session-log" class="TerminalLog TerminalLog--session"></div>
 
       <script>
+        // Terminal runtime: handles command execution, rendering, shortcuts, and input UX.
         import { executeCommand } from "../lib/engine";
 
         const log = document.getElementById("boot-log");
         const sessionLog = document.getElementById("session-log");
+        const promptBar = document.querySelector(
+          ".PromptBar",
+        ) as HTMLElement | null;
         const promptInput = document.getElementById(
           "prompt-input",
         ) as HTMLInputElement | null;
+        const promptAutocompletePreview = document.getElementById(
+          "prompt-autocomplete-preview",
+        ) as HTMLSpanElement | null;
+        let activeShortcutBlockIndex = -1;
 
+        // Returns true when keyboard focus is already inside a text-editable control.
+        const isEditableTarget = (target: EventTarget | null) => {
+          if (!(target instanceof HTMLElement)) return false;
+          if (target.isContentEditable) return true;
+
+          const tag = target.tagName;
+          return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
+        };
+
+        // Focuses the prompt input and moves caret to the end.
+        const focusPromptInput = () => {
+          if (!promptInput || promptInput.disabled) return;
+          promptInput.focus();
+          promptInput.setSelectionRange(
+            promptInput.value.length,
+            promptInput.value.length,
+          );
+        };
+
+        // Aligns a session block near the top anchor line of the scroll container.
+        const alignSessionToNodeStart = (node: HTMLElement) => {
+          if (!sessionLog) return;
+
+          node.scrollIntoView({ block: "start", inline: "nearest" });
+
+          let targetTop = 0;
+          let foundSessionAncestor = false;
+          let current: HTMLElement | null = node;
+
+          while (current) {
+            if (current === sessionLog) {
+              foundSessionAncestor = true;
+              break;
+            }
+
+            targetTop += current.offsetTop;
+            current = current.offsetParent as HTMLElement | null;
+          }
+
+          if (!foundSessionAncestor) {
+            const containerRect = sessionLog.getBoundingClientRect();
+            const nodeRect = node.getBoundingClientRect();
+            targetTop =
+              sessionLog.scrollTop + (nodeRect.top - containerRect.top);
+          }
+
+          const anchorOffset = sessionLog.clientHeight * 0.25;
+          sessionLog.scrollTop = Math.max(0, targetTop - anchorOffset);
+        };
+
+        // Collects all rendered command result blocks.
+        const getSessionBlocks = () => {
+          if (!sessionLog) return [] as HTMLElement[];
+          return Array.from(
+            sessionLog.querySelectorAll(".SessionBlock"),
+          ).filter((node): node is HTMLElement => node instanceof HTMLElement);
+        };
+
+        // Infers the currently visible block nearest to the configured anchor line.
+        const inferCurrentBlockIndex = (blocks: HTMLElement[]) => {
+          if (!sessionLog || !blocks.length) return -1;
+
+          const anchorLine =
+            sessionLog.scrollTop + sessionLog.clientHeight * 0.25;
+          let nearestIndex = 0;
+          let nearestDistance = Number.POSITIVE_INFINITY;
+
+          for (let index = 0; index < blocks.length; index++) {
+            const distance = Math.abs(blocks[index].offsetTop - anchorLine);
+            if (distance < nearestDistance) {
+              nearestDistance = distance;
+              nearestIndex = index;
+            }
+          }
+
+          return nearestIndex;
+        };
+
+        // Moves viewport focus between previous and next output blocks.
+        const navigateOutputBlocks = (direction: -1 | 1) => {
+          const blocks = getSessionBlocks();
+          if (!blocks.length) return false;
+
+          if (
+            activeShortcutBlockIndex < 0 ||
+            activeShortcutBlockIndex >= blocks.length
+          ) {
+            activeShortcutBlockIndex = inferCurrentBlockIndex(blocks);
+          }
+
+          const targetIndex = Math.min(
+            blocks.length - 1,
+            Math.max(0, activeShortcutBlockIndex + direction),
+          );
+
+          activeShortcutBlockIndex = targetIndex;
+          const targetBlock = blocks[targetIndex];
+          alignSessionToNodeStart(targetBlock);
+          requestAnimationFrame(() => alignSessionToNodeStart(targetBlock));
+          return true;
+        };
+
+        // Global keyboard shortcuts for output navigation and prompt focus.
+        document.addEventListener("keydown", (event: KeyboardEvent) => {
+          if (event.defaultPrevented || event.repeat) return;
+
+          const isAltBlockNavigation =
+            event.altKey &&
+            !event.ctrlKey &&
+            !event.metaKey &&
+            !event.shiftKey &&
+            (event.key === "ArrowUp" || event.key === "ArrowDown");
+
+          if (isAltBlockNavigation) {
+            const direction = event.key === "ArrowUp" ? -1 : 1;
+            const handled = navigateOutputBlocks(direction);
+            if (handled) event.preventDefault();
+            return;
+          }
+
+          const isFocusShortcut =
+            (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "i";
+
+          if (!isFocusShortcut || isEditableTarget(event.target)) return;
+
+          event.preventDefault();
+          focusPromptInput();
+        });
+
+        // Allows tapping prompt bar chrome to focus the command input.
+        promptBar?.addEventListener("pointerdown", (event: Event) => {
+          if (isEditableTarget(event.target)) return;
+          focusPromptInput();
+        });
+
+        // Sanitizes rich html command output before injecting into the terminal DOM.
         const sanitizeHtml = (unsafeHtml: string): string => {
           const template = document.createElement("template");
           template.innerHTML = unsafeHtml;
@@ -131,10 +275,15 @@
           const isSafeUrl = (url: string) => {
             const trimmed = url.trim();
             if (!trimmed) return false;
+
+            const isSameOriginAbsolutePath =
+              trimmed.startsWith("/") && !trimmed.startsWith("//");
+
             return (
               trimmed.startsWith("https://") ||
               trimmed.startsWith("http://") ||
-              trimmed.startsWith("mailto:")
+              trimmed.startsWith("mailto:") ||
+              isSameOriginAbsolutePath
             );
           };
 
@@ -177,6 +326,7 @@
           return template.innerHTML;
         };
 
+        // Appends one command+output block and keeps the newest block in view.
         const appendBlock = (
           command: string,
           output: string,
@@ -184,6 +334,11 @@
           isError = false,
         ) => {
           if (!sessionLog) return;
+
+          const normalizedCommand = command.trim().toLowerCase();
+          const isNeofetchOutput =
+            normalizedCommand === "neofetch" ||
+            normalizedCommand.startsWith("neofetch ");
 
           const block = document.createElement("div");
           block.className = "SessionBlock";
@@ -216,6 +371,9 @@
             outputPre.className = isError
               ? "SessionOutput SessionOutput--error"
               : "SessionOutput";
+            if (isNeofetchOutput) {
+              outputPre.classList.add("SessionOutput--neofetch");
+            }
             outputPre.textContent = output;
             outputNode = outputPre;
           }
@@ -224,17 +382,20 @@
           block.appendChild(outputNode);
           sessionLog.appendChild(block);
 
-          const targetTop =
-            outputNode.getBoundingClientRect().top -
-            sessionLog.getBoundingClientRect().top +
-            sessionLog.scrollTop;
-          sessionLog.scrollTo({ top: targetTop, behavior: "auto" });
+          activeShortcutBlockIndex = getSessionBlocks().length - 1;
+
+          alignSessionToNodeStart(block);
+          requestAnimationFrame(() => alignSessionToNodeStart(block));
         };
 
+        // Clears all rendered session output blocks.
         const clearSession = () => {
-          if (sessionLog) sessionLog.innerHTML = "";
+          if (!sessionLog) return;
+          activeShortcutBlockIndex = -1;
+          sessionLog.innerHTML = "";
         };
 
+        // Replays the boot animation typing sequence before interactive mode.
         const runBootSequence = async (bootLogEl: HTMLElement | null) => {
           if (!bootLogEl) return;
 
@@ -288,6 +449,7 @@
           }
         };
 
+        // Wires prompt input behavior for history, autocomplete, and command execution.
         const initPromptSession = (
           inputEl: HTMLInputElement | null,
           bootLogEl: HTMLElement | null,
@@ -295,14 +457,165 @@
           if (!inputEl) return;
 
           let hasEnteredSessionMode = false;
+          const commandHistory: string[] = [];
+          let historyCursor = -1;
+          let historyDraft = "";
+          let autocompleteSeed = "";
+          let autocompleteMatches: string[] = [];
+          let autocompleteCursor = -1;
           const bootRoot = document.querySelector(".Boot");
 
+          // Resets cursor state used by ArrowUp/ArrowDown history traversal.
+          const resetHistoryNavigation = () => {
+            historyCursor = -1;
+            historyDraft = "";
+          };
+
+          // Resets Tab cycling state used by history autocomplete.
+          const resetAutocompleteNavigation = () => {
+            autocompleteSeed = "";
+            autocompleteMatches = [];
+            autocompleteCursor = -1;
+          };
+
+          // Computes unique recent history matches for a typed prefix.
+          const getHistoryAutocompleteMatches = (seed: string) => {
+            const prefix = seed.trim();
+            const uniqueRecentMatches: string[] = [];
+            const seen = new Set<string>();
+
+            for (let index = commandHistory.length - 1; index >= 0; index--) {
+              const item = commandHistory[index];
+              if (seen.has(item)) continue;
+              seen.add(item);
+
+              if (prefix && !item.startsWith(prefix)) continue;
+              uniqueRecentMatches.push(item);
+            }
+
+            return uniqueRecentMatches;
+          };
+
+          // Updates the ghosted autocomplete preview text shown behind the input.
+          const setAutocompletePreview = (value: string) => {
+            if (!promptAutocompletePreview) return;
+            promptAutocompletePreview.textContent = value;
+          };
+
+          // Refreshes preview content from the best current history candidate.
+          const updateAutocompletePreview = () => {
+            const seed = inputEl.value.trim();
+            if (!seed) {
+              setAutocompletePreview("");
+              return;
+            }
+
+            const [candidate] = getHistoryAutocompleteMatches(seed);
+            if (!candidate || candidate === seed) {
+              setAutocompletePreview("");
+              return;
+            }
+
+            setAutocompletePreview(candidate);
+          };
+
+          // Sets input value and keeps caret pinned to the end.
+          const setInputValue = (value: string) => {
+            inputEl.value = value;
+            inputEl.setSelectionRange(value.length, value.length);
+          };
+
+          inputEl.addEventListener("input", () => {
+            if (historyCursor !== -1) {
+              historyCursor = -1;
+              historyDraft = inputEl.value;
+            }
+
+            resetAutocompleteNavigation();
+            updateAutocompletePreview();
+          });
+
           inputEl.addEventListener("keydown", async (e: KeyboardEvent) => {
+            if (e.key === "Tab") {
+              e.preventDefault();
+              if (!commandHistory.length) return;
+
+              const seed = inputEl.value.trim();
+              const shouldRecomputeMatches =
+                autocompleteCursor === -1 ||
+                autocompleteSeed !== seed ||
+                !autocompleteMatches.length;
+
+              if (shouldRecomputeMatches) {
+                autocompleteSeed = seed;
+                autocompleteMatches = getHistoryAutocompleteMatches(seed);
+
+                if (!autocompleteMatches.length) {
+                  resetAutocompleteNavigation();
+                  return;
+                }
+
+                autocompleteCursor = e.shiftKey
+                  ? autocompleteMatches.length - 1
+                  : 0;
+              } else {
+                const delta = e.shiftKey ? -1 : 1;
+                const nextIndex = autocompleteCursor + delta;
+
+                autocompleteCursor =
+                  (nextIndex + autocompleteMatches.length) %
+                  autocompleteMatches.length;
+              }
+
+              const nextValue = autocompleteMatches[autocompleteCursor];
+              setInputValue(nextValue ?? "");
+              resetHistoryNavigation();
+              updateAutocompletePreview();
+              return;
+            }
+
+            if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+              if (!commandHistory.length) return;
+              e.preventDefault();
+
+              resetAutocompleteNavigation();
+
+              if (historyCursor === -1) {
+                historyDraft = inputEl.value;
+                historyCursor = commandHistory.length;
+              }
+
+              if (e.key === "ArrowUp") {
+                historyCursor = Math.max(0, historyCursor - 1);
+                setInputValue(commandHistory[historyCursor] ?? "");
+                updateAutocompletePreview();
+                return;
+              }
+
+              historyCursor = Math.min(
+                commandHistory.length,
+                historyCursor + 1,
+              );
+              if (historyCursor === commandHistory.length) {
+                setInputValue(historyDraft);
+                resetHistoryNavigation();
+              } else {
+                setInputValue(commandHistory[historyCursor] ?? "");
+              }
+              updateAutocompletePreview();
+              return;
+            }
+
             if (e.key !== "Enter") return;
             e.preventDefault();
 
             const raw = inputEl.value.trim();
             if (!raw) return;
+
+            commandHistory.push(raw);
+            resetHistoryNavigation();
+            resetAutocompleteNavigation();
+            setAutocompletePreview("");
 
             if (!hasEnteredSessionMode) {
               hasEnteredSessionMode = true;
@@ -334,10 +647,12 @@
               appendBlock(raw, `Runtime error: ${message}`, "text", true);
             } finally {
               inputEl.value = "";
+              setAutocompletePreview("");
             }
           });
         };
 
+        // Bootstraps disabled prompt state, boot animation, then interactive mode.
         (async () => {
           if (!log) {
             console.warn(
@@ -345,7 +660,7 @@
             );
             if (promptInput) {
               promptInput.disabled = false;
-              promptInput.focus();
+              focusPromptInput();
               initPromptSession(promptInput, null);
             }
             return;
@@ -357,7 +672,7 @@
 
           if (promptInput) {
             promptInput.disabled = false;
-            promptInput.focus();
+            focusPromptInput();
             initPromptSession(promptInput, log);
           }
         })();
@@ -372,15 +687,22 @@
               <span class="PromptCwd">~</span>
               <span class="PromptDim">$</span>
             </span>
-            <input
-              id="prompt-input"
-              class="PromptInput"
-              type="text"
-              autocomplete="off"
-              autocapitalize="off"
-              spellcheck="false"
-              disabled
-            />
+            <div class="PromptInputWrap">
+              <span
+                id="prompt-autocomplete-preview"
+                class="PromptAutocompletePreview"
+                aria-hidden="true"></span>
+              <input
+                id="prompt-input"
+                class="PromptInput"
+                type="text"
+                placeholder="Type a command here..."
+                autocomplete="off"
+                autocapitalize="off"
+                spellcheck="false"
+                disabled
+              />
+            </div>
           </div>
         </div>
       </footer>

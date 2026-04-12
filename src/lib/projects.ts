@@ -1,5 +1,17 @@
+// GitHub username used for repository listing and metadata queries.
 const GITHUB_USERNAME = "ri5hii";
 
+// Add repository names here to hide them from `projects` listing/details.
+const EXCLUDED_REPO_NAMES: string[] = ["zinnia"];
+const EXCLUDED_REPO_SET = new Set(
+  EXCLUDED_REPO_NAMES.map((name) => name.trim().toLowerCase()).filter(Boolean),
+);
+
+// Checks whether a repository should be hidden from user-facing project commands.
+const isRepoExcluded = (repoName: string) =>
+  EXCLUDED_REPO_SET.has(repoName.trim().toLowerCase());
+
+// Summary shape returned by the GitHub repositories listing endpoint.
 type RepoSummary = {
   name: string;
   html_url: string;
@@ -10,6 +22,7 @@ type RepoSummary = {
   updated_at: string;
 };
 
+// Detail shape returned by the GitHub single repository endpoint.
 type RepoDetail = {
   name: string;
   html_url: string;
@@ -21,9 +34,11 @@ type RepoDetail = {
   topics?: string[];
 };
 
+// Session caches for project index and rendered project readmes.
 const projectIndexCache = new Map<string, string>();
 const projectReadmeCache = new Map<string, string>();
 
+// Escapes raw text to safely embed repository content in HTML.
 const escapeHtml = (value: string) =>
   value
     .replaceAll("&", "&amp;")
@@ -32,14 +47,17 @@ const escapeHtml = (value: string) =>
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
 
+// Normalizes badge labels for shields.io URLs.
 const toBadgeLabel = (value: string) =>
   encodeURIComponent(value.replaceAll("_", " ").replaceAll("-", " "));
 
+// Creates a shields.io badge image for project metadata rows.
 const buildBadgeImg = (label: string, message: string, color: string) => {
   const src = `https://img.shields.io/badge/${toBadgeLabel(label)}-${toBadgeLabel(message)}-${color}?style=flat-square`;
   return `<img src="${src}" alt="${escapeHtml(label)} ${escapeHtml(message)} badge" />`;
 };
 
+// Fetches full repository metadata used for README detail headers.
 const fetchRepoDetail = async (repoName: string): Promise<RepoDetail> => {
   const response = await fetch(
     `https://api.github.com/repos/${GITHUB_USERNAME}/${encodeURIComponent(repoName)}`,
@@ -60,6 +78,7 @@ const fetchRepoDetail = async (repoName: string): Promise<RepoDetail> => {
   return (await response.json()) as RepoDetail;
 };
 
+// Builds the metadata header block shown above rendered project README content.
 const buildProjectHeaderHtml = (repo: RepoDetail) => {
   const badges: string[] = [];
 
@@ -93,6 +112,7 @@ const buildProjectHeaderHtml = (repo: RepoDetail) => {
     .join("\n");
 };
 
+// Renders README markdown via GitHub API and falls back to plain preformatted content.
 const renderMarkdownToHtml = async (markdown: string, contextRepo: string) => {
   try {
     const response = await fetch("https://api.github.com/markdown", {
@@ -123,6 +143,7 @@ const renderMarkdownToHtml = async (markdown: string, contextRepo: string) => {
   }
 };
 
+// Fetches all repositories for the configured user in updated order.
 const fetchRepos = async (): Promise<RepoSummary[]> => {
   const response = await fetch(
     `https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=100&sort=updated`,
@@ -140,17 +161,19 @@ const fetchRepos = async (): Promise<RepoSummary[]> => {
   return (await response.json()) as RepoSummary[];
 };
 
+// Builds the html list used by the base projects command.
 export const fetchProjectsIndexHtml = async (
   includeAll = false,
 ): Promise<string> => {
-  const cacheKey = includeAll ? "all" : "default";
+  const exclusionKey = Array.from(EXCLUDED_REPO_SET).sort().join(",");
+  const cacheKey = `${includeAll ? "all" : "default"}:${exclusionKey}`;
   const cached = projectIndexCache.get(cacheKey);
   if (cached) return cached;
 
   const repos = await fetchRepos();
-  const filtered = includeAll
-    ? repos
-    : repos.filter((repo) => !repo.fork && !repo.archived);
+  const filtered = (
+    includeAll ? repos : repos.filter((repo) => !repo.archived)
+  ).filter((repo) => !isRepoExcluded(repo.name));
 
   const items = filtered
     .slice(0, 12)
@@ -172,6 +195,7 @@ export const fetchProjectsIndexHtml = async (
   return html;
 };
 
+// Builds a rendered README view for a single repository.
 export const fetchProjectReadmeHtml = async (
   repoName: string,
 ): Promise<string> => {
@@ -180,6 +204,10 @@ export const fetchProjectReadmeHtml = async (
     throw new Error(
       "Please provide a repository name. Example: projects rishi.sh",
     );
+  }
+
+  if (isRepoExcluded(normalized)) {
+    throw new Error(`Repository is excluded by local config: ${normalized}`);
   }
 
   const cacheKey = normalized.toLowerCase();

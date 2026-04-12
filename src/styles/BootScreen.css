@@ -1,47 +1,70 @@
+/* BootScreen styles define terminal shell layout, responsive behavior, and command output themes. */
 @layer components {
   .Boot {
-    --promptbar-gap: 1px;
-    @apply h-screen flex flex-col;
-
-    /* Thin separator gap above prompt bar */
-    padding-bottom: var(--promptbar-gap);
+    --shell-gutter: clamp(0.4rem, 1.25vw, 1rem);
+    --promptbar-height: clamp(3.4rem, 7.2vh, 4.8rem);
+    @apply min-h-screen flex flex-col;
+    min-height: 100svh;
+    min-height: 100dvh;
+    padding-bottom: calc(var(--promptbar-height) + env(safe-area-inset-bottom));
   }
 
   /* Header */
   .Header {
-    @apply w-full max-w-screen-2xl mx-auto px-6 pt-8 pb-4 bg-[#10141a] z-50;
+    @apply w-full max-w-screen-2xl mx-auto bg-[#10141a] z-50;
     @apply flex flex-col items-center;
+    padding-inline: clamp(0.85rem, 2.6vw, 1.5rem);
+    padding-top: clamp(0.9rem, 4.4vh, 2rem);
+    padding-bottom: clamp(0.45rem, 2vh, 1rem);
   }
 
   .Boot--session .Header {
-    @apply pt-2 pb-1;
+    padding-top: clamp(0.35rem, 1.25vh, 0.65rem);
+    padding-bottom: clamp(0.2rem, 0.9vh, 0.4rem);
   }
 
   .HeaderInner {
-    @apply w-full mb-8 flex justify-end;
+    @apply w-full flex justify-end;
+    margin-bottom: clamp(0.9rem, 3.1vh, 2rem);
   }
 
   .Boot--session .HeaderInner {
-    @apply mb-1;
+    margin-bottom: clamp(0.25rem, 0.8vh, 0.4rem);
   }
 
   .Boot--session .Button--switch {
-    @apply text-xs;
-    letter-spacing: 0.14em;
+    font-size: clamp(0.56rem, 0.9vw, 0.72rem);
+    letter-spacing: clamp(0.08em, 0.18vw, 0.14em);
+  }
+
+  .Boot--session .ButtonIndicator {
+    font-size: clamp(0.7rem, 1vw, 0.86rem);
   }
 
   .Button {
     @apply inline-flex items-center gap-2;
+    min-width: 0;
   }
 
   .Button--switch {
-    @apply text-sm uppercase tracking-widest transition-opacity;
+    @apply uppercase transition-opacity;
     @apply text-[#dfe2eb]/60 hover:text-[#58a6ff] hover:opacity-80;
     @apply font-['Space_Grotesk'];
+    font-size: clamp(0.62rem, 1.15vw, 0.84rem);
+    letter-spacing: clamp(0.08em, 0.22vw, 0.18em);
+    line-height: 1;
+    white-space: nowrap;
   }
 
   .ButtonIndicator {
-    @apply text-sm inline-block align-middle opacity-80;
+    @apply inline-block align-middle opacity-80;
+    font-size: clamp(0.82rem, 1.45vw, 1rem);
+    line-height: 1;
+    font-variation-settings:
+      "opsz" 20,
+      "wght" 420,
+      "FILL" 0,
+      "GRAD" 0;
   }
 
   .ButtonText {
@@ -51,24 +74,26 @@
   /* Banner */
   .Banner {
     @apply w-full flex justify-center;
+    overflow-x: clip;
   }
 
   .BannerStack {
     position: relative;
     display: inline-block;
     text-align: left;
+    max-width: 100%;
   }
 
   .BannerText {
     @apply font-mono whitespace-pre leading-none;
-    @apply text-[1.25rem] md:text-[1.5rem] lg:text-[1.75rem];
+    font-size: clamp(0.36rem, 1.48vw, 1.72rem);
     margin: 0;
     color: #dfe2eb;
     text-align: left;
   }
 
   .Boot--session .BannerText {
-    @apply text-[0.55rem] md:text-[0.72rem] lg:text-[0.86rem];
+    font-size: clamp(0.28rem, 0.74vw, 0.86rem);
   }
 
   .BannerText--sizer {
@@ -173,6 +198,7 @@
   /* Proper layout container */
   .Output {
     @apply flex-1 min-h-0 flex;
+    min-width: 0;
   }
 
   /* Terminal defaults (full-capable) */
@@ -182,27 +208,30 @@
 
   .TerminalWindow {
     @apply w-full max-w-none h-full min-h-0 relative overflow-hidden
-         bg-[#181c22] rounded-none p-6 border-y border-[#dfe2eb]/10 border-x-0
+        bg-[#181c22] rounded-none border-y border-[#dfe2eb]/10 border-x-0
         shadow-[0_32px_64px_-12px_rgba(162,201,255,0.05)] flex flex-col;
+    padding: clamp(0.9rem, 2.1vw, 1.5rem);
   }
 
   /* Boot mode compact card */
   .Boot:not(.Boot--session) .Terminal {
-    @apply items-center justify-center px-6;
+    @apply items-center justify-center;
+    padding-inline: clamp(0.6rem, 3vw, 1.5rem);
   }
 
   .Boot:not(.Boot--session) .TerminalWindow {
     @apply max-w-3xl h-auto min-h-0 rounded-md border border-[#dfe2eb]/10 border-x;
+    width: min(100%, 56rem);
   }
 
   /* Session mode explicitly full-size */
   .Boot--session .Output {
     @apply flex-1 min-h-0;
     box-sizing: border-box;
-    padding-top: 1%;
-    padding-right: 1%;
-    padding-bottom: 5%;
-    padding-left: 1%;
+    padding-top: clamp(0.35rem, 1vh, 0.8rem);
+    padding-right: var(--shell-gutter);
+    padding-left: var(--shell-gutter);
+    padding-bottom: clamp(0.75rem, 2.2vh, 1.35rem);
   }
 
   .Boot--session .Terminal {
@@ -214,7 +243,8 @@
   }
 
   .TerminalControls {
-    @apply flex gap-2 mb-6 opacity-30;
+    @apply flex gap-2 opacity-30;
+    margin-bottom: clamp(0.65rem, 2.2vh, 1.25rem);
   }
 
   .TerminalDot {
@@ -238,7 +268,8 @@
   }
 
   .TerminalLog {
-    @apply space-y-2 text-sm sm:text-base leading-relaxed;
+    @apply space-y-2 leading-relaxed;
+    font-size: clamp(0.78rem, 1.45vw, 1rem);
   }
 
   .TerminalLine.is-hidden {
@@ -254,6 +285,7 @@
     @apply flex items-start gap-4;
     opacity: 1;
     transform: none;
+    min-width: 0;
   }
 
   .TerminalLineNumber {
@@ -295,6 +327,7 @@
 
   .Boot--session .TerminalLog--session {
     @apply mt-0 flex-1 min-h-0 overflow-y-auto pr-1;
+    overflow-anchor: none;
   }
 
   .SessionBlock {
@@ -302,7 +335,8 @@
   }
 
   .SessionCommand {
-    @apply font-mono text-sm md:text-base flex items-baseline gap-2 text-left;
+    @apply font-mono flex items-baseline gap-2 text-left;
+    font-size: clamp(0.78rem, 1.4vw, 1rem);
   }
 
   .SessionPrompt {
@@ -314,13 +348,26 @@
   }
 
   .SessionOutput {
-    @apply mt-2 text-[#dfe2eb] font-mono text-sm md:text-base;
+    @apply mt-2 text-[#dfe2eb] font-mono;
+    font-size: clamp(0.78rem, 1.4vw, 1rem);
     white-space: pre-wrap;
     margin: 0;
   }
 
+  .SessionOutput--neofetch {
+    white-space: pre;
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-width: 100%;
+    display: block;
+    line-height: 1.25;
+    font-size: clamp(0.68rem, 1.2vw, 0.94rem);
+    -webkit-overflow-scrolling: touch;
+  }
+
   .SessionOutputRich {
-    @apply mt-2 text-[#dfe2eb] text-sm md:text-base;
+    @apply mt-2 text-[#dfe2eb];
+    font-size: clamp(0.78rem, 1.4vw, 1rem);
     white-space: normal;
     background: transparent;
     line-height: 1.6;
@@ -401,6 +448,99 @@
     height: 20px;
   }
 
+  .SessionOutputRich .NeofetchSplit {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: 0.25rem 1.2rem;
+    max-width: 100%;
+  }
+
+  .SessionOutputRich .NeofetchSplit pre {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    line-height: 1.25;
+    white-space: pre;
+    overflow: visible;
+  }
+
+  .SessionOutputRich .NeofetchLogo {
+    color: #dfe2eb;
+  }
+
+  .SessionOutputRich .NeofetchInfo {
+    color: #dfe2eb;
+    min-width: 0;
+  }
+
+  .SessionOutputRich .WhoamiNeo {
+    --whoami-line-height: 1.45em;
+    --whoami-line-count: 8;
+    --whoami-square-size: calc(
+      var(--whoami-line-count) * var(--whoami-line-height)
+    );
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, var(--whoami-square-size));
+    align-items: start;
+    gap: clamp(0.65rem, 2vw, 1rem);
+  }
+
+  .SessionOutputRich .WhoamiNeoMeta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.18rem;
+    min-width: 0;
+    line-height: var(--whoami-line-height);
+  }
+
+  .SessionOutputRich .WhoamiNeoTitle {
+    color: #a2c9ff;
+    font-weight: 600;
+  }
+
+  .SessionOutputRich .WhoamiNeoRule {
+    color: rgba(223, 226, 235, 0.46);
+    letter-spacing: 0.02em;
+  }
+
+  .SessionOutputRich .WhoamiNeoRow {
+    display: grid;
+    grid-template-columns: 8ch 1ch minmax(0, 1fr);
+    align-items: baseline;
+    column-gap: 0.35rem;
+  }
+
+  .SessionOutputRich .WhoamiNeoKey {
+    color: #58a6ff;
+  }
+
+  .SessionOutputRich .WhoamiNeoSep {
+    color: rgba(223, 226, 235, 0.5);
+    text-align: center;
+  }
+
+  .SessionOutputRich .WhoamiNeoValue {
+    color: #dfe2eb;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .SessionOutputRich .WhoamiAvatar {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    inline-size: min(100%, var(--whoami-square-size));
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 0;
+    border: 1px solid rgba(162, 201, 255, 0.28);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+    place-self: start center;
+  }
+
   .SessionOutputRich table {
     width: 100%;
     display: block;
@@ -415,19 +555,26 @@
   /* Footer prompt bar */
   .PromptBar {
     @apply fixed bottom-0 left-0 w-full z-50;
-    @apply flex items-center px-6 py-6;
+    @apply flex items-center;
     @apply bg-[#181c22] border-t border-[#dfe2eb]/10;
     @apply shadow-[0_-4px_12px_rgba(162,201,255,0.05)];
+    min-height: var(--promptbar-height);
+    padding-left: clamp(0.65rem, 2.8vw, 1.5rem);
+    padding-right: clamp(0.65rem, 2.8vw, 1.5rem);
+    padding-top: clamp(0.4rem, 1.6vh, 0.95rem);
+    padding-bottom: calc(
+      clamp(0.42rem, 1.3vh, 0.82rem) + env(safe-area-inset-bottom)
+    );
     border-top-width: 1px;
   }
 
   .Boot--session .PromptBar {
     @apply border border-[#dfe2eb]/10;
     border-top-width: 1px;
-    left: 1%;
+    left: var(--shell-gutter);
     right: auto;
-    width: calc(100% - 2%);
-    border-radius: 0.25rem 0.25rem 0 0;
+    width: calc(100% - (var(--shell-gutter) * 2));
+    border-radius: clamp(0.35rem, 1vw, 0.5rem) clamp(0.35rem, 1vw, 0.5rem) 0 0;
     padding-left: 0;
     padding-right: 0;
   }
@@ -453,15 +600,38 @@
 
   .Prompt {
     @apply w-full min-w-0 flex items-center font-mono;
-    @apply text-sm md:text-base;
+    font-size: clamp(0.8rem, 1.45vw, 1rem);
+  }
+
+  .PromptInputWrap {
+    @apply relative flex-1 min-w-0;
+    margin-left: 1ch;
+  }
+
+  .PromptAutocompletePreview {
+    @apply absolute inset-y-0 left-0 flex items-center select-none;
+    @apply text-[#dfe2eb]/32 font-mono pointer-events-none;
+    width: 100%;
+    font-size: clamp(0.8rem, 1.45vw, 1rem);
+    line-height: 1.45;
+    white-space: pre;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    z-index: 0;
   }
 
   .PromptPrefix {
     @apply inline-flex items-center gap-2;
+    min-width: 0;
+    white-space: nowrap;
+    flex: 0 1 auto;
   }
 
   .PromptHost {
     @apply text-[#58a6ff];
+    max-width: min(44vw, 14rem);
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .PromptDim {
@@ -474,12 +644,29 @@
 
   .PromptInput {
     @apply bg-transparent outline-none border-0 text-[#dfe2eb] font-mono;
-    @apply text-sm md:text-base;
     flex: 1;
+    font-size: clamp(0.8rem, 1.45vw, 1rem);
     min-width: 0;
     width: 100%;
     caret-color: #a2c9ff;
-    margin-left: 1ch;
+    margin-left: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .PromptInput::placeholder {
+    color: rgba(223, 226, 235, 0.55);
+    opacity: 1;
+  }
+
+  .PromptInput::-webkit-input-placeholder {
+    color: rgba(223, 226, 235, 0.55);
+    opacity: 1;
+  }
+
+  .PromptInput::-moz-placeholder {
+    color: rgba(223, 226, 235, 0.55);
+    opacity: 1;
   }
 
   .PromptInput:disabled {
@@ -490,5 +677,124 @@
     @apply inline-block align-middle ml-1;
     @apply w-[10px] h-[1.2em];
     @apply bg-[#a2c9ff];
+  }
+
+  @media (max-width: 768px) {
+    .TerminalLine {
+      gap: 0.62rem;
+    }
+
+    .TerminalLineNumber {
+      width: 1.65rem;
+      text-align: right;
+    }
+
+    .SessionOutputRich h1,
+    .SessionOutputRich h2,
+    .SessionOutputRich h3,
+    .SessionOutputRich h4 {
+      margin-top: 0.72rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .SessionOutputRich .WhoamiNeo {
+      --whoami-line-height: 1.35em;
+      grid-template-columns: minmax(0, 1fr) minmax(0, var(--whoami-square-size));
+      gap: 0.7rem;
+    }
+
+    .SessionOutputRich .WhoamiNeoRow {
+      grid-template-columns: 7ch 1ch minmax(0, 1fr);
+    }
+
+    .SessionOutputRich .NeofetchSplit {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
+
+    .SessionOutputRich .NeofetchLogo,
+    .SessionOutputRich .NeofetchInfo {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+
+  @media (max-width: 540px) {
+    .Header {
+      padding-top: clamp(0.55rem, 2.4vh, 0.9rem);
+    }
+
+    .Boot:not(.Boot--session) .TerminalWindow {
+      border-left-width: 0;
+      border-right-width: 0;
+      border-radius: 0;
+    }
+
+    .TerminalLineNumber {
+      display: none;
+    }
+
+    .PromptPrefix {
+      gap: 0.38rem;
+    }
+
+    .PromptHost {
+      max-width: 8.5rem;
+    }
+
+    .Boot--session .PromptBar {
+      left: max(0.35rem, env(safe-area-inset-left));
+      width: calc(
+        100% - max(0.35rem, env(safe-area-inset-left)) -
+          max(0.35rem, env(safe-area-inset-right))
+      );
+    }
+
+    .Button {
+      gap: 0.34rem;
+    }
+
+    .Button--switch {
+      font-size: 0.54rem;
+      letter-spacing: 0.1em;
+    }
+
+    .ButtonIndicator {
+      font-size: 0.72rem;
+    }
+
+    .SessionOutputRich .WhoamiNeo {
+      --whoami-line-height: 1.25em;
+      grid-template-columns: minmax(0, 1fr) minmax(0, var(--whoami-square-size));
+      gap: 0.55rem;
+    }
+
+    .SessionOutputRich .WhoamiNeoRow {
+      grid-template-columns: 6.5ch 1ch minmax(0, 1fr);
+      column-gap: 0.25rem;
+    }
+
+    .SessionOutput--neofetch {
+      font-size: 0.72rem;
+      line-height: 1.2;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .BannerText {
+      font-size: clamp(0.3rem, 1.22vw, 0.68rem);
+    }
+
+    .Boot--session .BannerText {
+      font-size: clamp(0.24rem, 0.7vw, 0.48rem);
+    }
+
+    .PromptHost {
+      display: none;
+    }
+
+    .PromptPrefix .PromptDim:first-of-type {
+      display: none;
+    }
   }
 }
