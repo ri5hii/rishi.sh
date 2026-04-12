@@ -81,6 +81,9 @@
 
         const log = document.getElementById("boot-log");
         const sessionLog = document.getElementById("session-log");
+        const promptBar = document.querySelector(
+          ".PromptBar",
+        ) as HTMLElement | null;
         const promptInput = document.getElementById(
           "prompt-input",
         ) as HTMLInputElement | null;
@@ -102,6 +105,34 @@
           );
         };
 
+        const alignSessionToNodeStart = (node: HTMLElement) => {
+          if (!sessionLog) return;
+
+          node.scrollIntoView({ block: "start", inline: "nearest" });
+
+          let targetTop = 0;
+          let foundSessionAncestor = false;
+          let current: HTMLElement | null = node;
+
+          while (current) {
+            if (current === sessionLog) {
+              foundSessionAncestor = true;
+              break;
+            }
+
+            targetTop += current.offsetTop;
+            current = current.offsetParent as HTMLElement | null;
+          }
+
+          if (!foundSessionAncestor) {
+            const containerRect = sessionLog.getBoundingClientRect();
+            const nodeRect = node.getBoundingClientRect();
+            targetTop = sessionLog.scrollTop + (nodeRect.top - containerRect.top);
+          }
+
+          sessionLog.scrollTop = Math.max(0, targetTop);
+        };
+
         document.addEventListener("keydown", (event: KeyboardEvent) => {
           if (event.defaultPrevented || event.repeat) return;
 
@@ -111,6 +142,11 @@
           if (!isFocusShortcut || isEditableTarget(event.target)) return;
 
           event.preventDefault();
+          focusPromptInput();
+        });
+
+        promptBar?.addEventListener("pointerdown", (event: Event) => {
+          if (isEditableTarget(event.target)) return;
           focusPromptInput();
         });
 
@@ -253,15 +289,13 @@
           block.appendChild(outputNode);
           sessionLog.appendChild(block);
 
-          const targetTop =
-            outputNode.getBoundingClientRect().top -
-            sessionLog.getBoundingClientRect().top +
-            sessionLog.scrollTop;
-          sessionLog.scrollTo({ top: targetTop, behavior: "auto" });
+          alignSessionToNodeStart(block);
+          requestAnimationFrame(() => alignSessionToNodeStart(block));
         };
 
         const clearSession = () => {
-          if (sessionLog) sessionLog.innerHTML = "";
+          if (!sessionLog) return;
+          sessionLog.innerHTML = "";
         };
 
         const runBootSequence = async (bootLogEl: HTMLElement | null) => {

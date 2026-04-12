@@ -6,6 +6,12 @@
         color-scheme: dark;
     }
 
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
     html,
     body {
         height: 100%;
@@ -14,6 +20,7 @@
     body {
         background-color: #10141a;
         color: #dfe2eb;
+        overflow-x: hidden;
         font-family:
             "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
             Consolas, "Liberation Mono", "Courier New", monospace;

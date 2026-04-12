@@ -41,7 +41,10 @@ const parseCommandArgs = (
     return { positionals: [...args], flags: new Set<string>() };
   }
 
-  const aliasToLong = new Map<string, { long: string; expectsValue?: boolean }>();
+  const aliasToLong = new Map<
+    string,
+    { long: string; expectsValue?: boolean }
+  >();
   for (const flag of definition.flags) {
     aliasToLong.set(flag.long, {
       long: flag.long,
@@ -90,7 +93,10 @@ const parseCommandArgs = (
       if (inlineValue !== undefined && !inlineValue.trim()) {
         return {
           consumeNext: false,
-          error: commandError(commandName, `Flag ${flagToken} requires a value.`),
+          error: commandError(
+            commandName,
+            `Flag ${flagToken} requires a value.`,
+          ),
         };
       }
 
@@ -375,10 +381,7 @@ export const executeCommand = async (input: string): Promise<EngineResult> => {
     ).length;
 
     if (selectedDestinations > 1) {
-      return commandError(
-        command,
-        "Use only one destination flag at a time.",
-      );
+      return commandError(command, "Use only one destination flag at a time.");
     }
 
     if (openGitHub || openLinkedIn || openEmail) {
