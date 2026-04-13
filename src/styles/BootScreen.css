@@ -366,6 +366,22 @@
     @apply text-[#ffb3ad];
   }
 
+  /* Runtime-generated: full-width output frame for all command results. */
+  .SessionOutputFrame {
+    width: 100%;
+    margin-top: 0.55rem;
+    padding: 0.72rem 0.8rem;
+    border: 1px solid rgba(223, 226, 235, 0.28);
+    background: rgba(24, 28, 34, 0.88);
+    box-sizing: border-box;
+  }
+
+  /* Runtime-generated: output frame variant used for error responses. */
+  .SessionOutputFrame--error {
+    border-color: rgba(255, 180, 171, 0.45);
+    background: rgba(54, 24, 24, 0.6);
+  }
+
   /* Runtime-generated: plain text output blocks (<pre class="SessionOutput">). */
   .SessionOutput {
     @apply mt-2 text-[#dfe2eb] font-mono;
@@ -394,6 +410,11 @@
     background: transparent;
     line-height: 1.6;
     overflow-wrap: anywhere;
+  }
+
+  .SessionOutputFrame > .SessionOutput,
+  .SessionOutputFrame > .SessionOutputRich {
+    margin-top: 0;
   }
 
   .SessionOutputRich > :first-child {
