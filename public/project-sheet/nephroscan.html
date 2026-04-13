@@ -1,0 +1,58 @@
+<div class="ContentSheet ContentSheet--project">
+  <pre class="ContentPre">
+NephroScan
+Repository: <a href="https://github.com/ri5hii/nephroscan">github.com/ri5hii/nephroscan</a>
+
+AI-assisted kidney disease risk analysis workflow
+
+NephroScan is a clinical decision-support project that helps surface kidney risk signals from routine health data.
+
+It combines structured data processing, risk-model inference, and clear output summaries to support early triage workflows.
+
+Design goal:
+- keep clinician-facing output interpretable
+- reduce analysis friction
+- preserve auditability of each inference run
+	</pre>
+
+  <div class="MarkdownCards">
+    <div class="MarkdownCard">
+      <h3 class="MarkdownCardTitle">Core Features</h3>
+      <ul>
+        <li>Risk score generation from patient features</li>
+        <li>Interpretable factor summary for each prediction</li>
+        <li>Batch analysis mode for screening pipelines</li>
+        <li>Exportable result snapshots for review</li>
+      </ul>
+    </div>
+
+    <div class="MarkdownCard">
+      <h3 class="MarkdownCardTitle">Tech Stack</h3>
+      <ul>
+        <li>Python</li>
+        <li>FastAPI</li>
+        <li>Pandas + NumPy</li>
+        <li>Scikit-learn</li>
+      </ul>
+    </div>
+
+    <div class="MarkdownCard">
+      <h3 class="MarkdownCardTitle">Model Pipeline</h3>
+      <ul>
+        <li>Input validation and feature normalization</li>
+        <li>Model inference on structured patient vectors</li>
+        <li>Post-processing for threshold bands</li>
+        <li>Human-readable risk explanation output</li>
+      </ul>
+    </div>
+
+    <div class="MarkdownCard">
+      <h3 class="MarkdownCardTitle">Versioning</h3>
+      <ul>
+        <li>v0.1 baseline data + training pipeline</li>
+        <li>v0.2 api inference endpoint + reports</li>
+        <li>v0.3 explainability and batch mode</li>
+      </ul>
+    </div>
+  </div>
+</div>

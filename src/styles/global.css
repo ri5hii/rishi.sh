@@ -1,22 +1,29 @@
 @import "tailwindcss";
 
-/* Base styles applied globally across the site. */
+/*
+  Global baseline styles applied once for all pages and components.
+  This file provides only app-wide primitives; component mapping lives in BootScreen.css.
+*/
 @layer base {
+  /* Document-level color scheme hint for native form controls and UA styling. */
   :root {
     color-scheme: dark;
   }
 
+  /* Universal box sizing reset for predictable layout math. */
   *,
   *::before,
   *::after {
     box-sizing: border-box;
   }
 
+  /* Full-height root box for viewport-based terminal layout behavior. */
   html,
   body {
     height: 100%;
   }
 
+  /* Global body palette and monospace-first typography baseline. */
   body {
     background-color: #10141a;
     color: #dfe2eb;
@@ -24,23 +31,6 @@
     font-family:
       "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
       "Liberation Mono", "Courier New", monospace;
-  }
-}
-
-/* Small reusable utilities not covered by Tailwind defaults. */
-@layer utilities {
-  .cursor-blink {
-    display: inline-block;
-    width: 10px;
-    height: 1.2em;
-    background-color: #a2c9ff;
-    vertical-align: middle;
-    margin-left: 4px;
-  }
-
-  .ascii-art {
-    line-height: 1.1;
-    white-space: pre;
   }
 }
 

@@ -1,0 +1,128 @@
+<div class="ContentSheet ContentSheet--project">
+  <pre class="ContentPre">
+Machina
+Repository: <a href="https://github.com/ri5hii/machina">github.com/ri5hii/machina</a>
+
+Concurrent job execution engine for Go
+
+Machina decouples work submission from execution, allowing systems to handle slow, heavy, or batch workloads without blocking the caller.
+
+Instead of executing work inline:
+Client → Submit Job → Receive ID immediately
+
+The engine handles:
+queueing → scheduling → execution → result storage
+
+This enables asynchronous, resource-controlled processing with bounded concurrency and structured lifecycle management.
+
+Designed for systems where reliability, control, and scalability of background work matter.
+  </pre>
+
+  <div class="MarkdownCards">
+    <div class="MarkdownCard">
+      <h3 class="MarkdownCardTitle">System Design</h3>
+      <ul>
+        <li>
+          Two-tier concurrency model:
+          <ul>
+            <li>- Worker pool (bounded job-level parallelism)</li>
+            <li>- Chunked fan-out using errgroup (item-level parallelism)</li>
+          </ul>
+        </li>
+        <li>
+          Strict separation of concerns:
+          <ul>
+            <li>- Jobs define logic</li>
+            <li>- Engine handles execution</li>
+            <li>- Registry maps job types</li>
+            <li>- Constructors bridge JSON → typed jobs</li>
+          </ul>
+        </li>
+        <li>
+          Context-driven cancellation ensures all in-flight work stops on
+          failure
+        </li>
+        <li>No unbounded goroutines regardless of workload size</li>
+      </ul>
+    </div>
+
+    <div class="MarkdownCard">
+      <h3 class="MarkdownCardTitle">Execution Model</h3>
+      <ul>
+        <li>
+          Job lifecycle:
+          <ul>
+            <li>pending → running → completed / failed</li>
+          </ul>
+        </li>
+        <li>
+          Batch jobs:
+          <ul>
+            <li>- Scan → discover items</li>
+            <li>- Chunk → partition workload</li>
+            <li>- RunBatch → parallel execution</li>
+            <li>- Aggregate → final result merge</li>
+          </ul>
+        </li>
+        <li>Failure propagation via shared context cancellation</li>
+      </ul>
+    </div>
+
+    <div class="MarkdownCard">
+      <h3 class="MarkdownCardTitle">Job Contracts</h3>
+      <ul>
+        <li><strong>SingleRunJob</strong>: Run(ctx)</li>
+        <li>
+          <strong>BatchProcessingJob</strong>:
+          <ul>
+            <li>- Scan()</li>
+            <li>- ChunkSize()</li>
+            <li>- RunBatch(ctx, batch)</li>
+            <li>- Aggregate(results)</li>
+          </ul>
+        </li>
+        <li>Jobs never manage goroutines or scheduling</li>
+      </ul>
+    </div>
+
+    <div class="MarkdownCard">
+      <h3 class="MarkdownCardTitle">API & CLI</h3>
+      <ul>
+        <li>
+          API:
+          <ul>
+            <li>- POST /jobs → submit</li>
+            <li>- GET /jobs → list</li>
+            <li>- GET /jobs/:id → status</li>
+            <li>- GET /health → health check</li>
+          </ul>
+        </li>
+        <li>
+          CLI:
+          <ul>
+            <li>- start, shutdown, health</li>
+            <li>- submit, status, list</li>
+            <li>- register, unregister, types</li>
+            <li>- config management</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="MarkdownCard">
+      <h3 class="MarkdownCardTitle">Built-in Jobs</h3>
+      <ul>
+        <li>file_encrypt → AES-256-GCM folder encryption</li>
+        <li>csv_transform → row-level transformations</li>
+      </ul>
+      <h3 class="MarkdownCardTitle">Configuration</h3>
+      <ul>
+        <li>- port (default: 8080)</li>
+        <li>- workers (default: 4)</li>
+        <li>- queue-size (default: 100)</li>
+        <li>- log-level (default: INFO)</li>
+        <li>- precedence: flag → config → fallback</li>
+      </ul>
+    </div>
+  </div>
+</div>

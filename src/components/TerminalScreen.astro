@@ -378,8 +378,14 @@
             outputNode = outputPre;
           }
 
+          const outputFrame = document.createElement("div");
+          outputFrame.className = isError
+            ? "SessionOutputFrame SessionOutputFrame--error"
+            : "SessionOutputFrame";
+          outputFrame.appendChild(outputNode);
+
           block.appendChild(commandLine);
-          block.appendChild(outputNode);
+          block.appendChild(outputFrame);
           sessionLog.appendChild(block);
 
           activeShortcutBlockIndex = getSessionBlocks().length - 1;
