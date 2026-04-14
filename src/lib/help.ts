@@ -1,18 +1,14 @@
 import { COMMANDS, COMMAND_NAMES, type CommandDefinition } from "./commands";
 
-// Pads command names so help index columns line up in monospace output.
-const pad = (value: string, width: number) =>
-  value.length >= width ? value : value + " ".repeat(width - value.length);
-
 // Renders command flag metadata into a terminal-friendly text block.
 const renderFlags = (flags: CommandDefinition["flags"]) => {
-  if (!flags.length) return "Flags:\n  (none)";
+  if (!flags.length) return "Flags:\n- (none)";
   const rows = flags.map((f) => {
     const short = f.short ? `, ${f.short}` : "";
     const valueHint = f.expectsValue ? " <value>" : "";
     const required = f.required ? " (required)" : "";
     const def = f.defaultValue ? ` [default: ${f.defaultValue}]` : "";
-    return `  ${f.long}${short}${valueHint}  ${f.description}${required}${def}`;
+    return `- ${f.long}${short}${valueHint}: ${f.description}${required}${def}`;
   });
   return ["Flags:", ...rows].join("\n");
 };
@@ -21,28 +17,24 @@ const renderFlags = (flags: CommandDefinition["flags"]) => {
 const renderShortcuts = () =>
   [
     "Shortcuts:",
-    "  Ctrl+I (Cmd+I)  Focus prompt input",
-    "  Alt+ArrowUp  Jump to previous command output block",
-    "  Alt+ArrowDown  Jump to next command output block",
-    "  ArrowUp/ArrowDown  Command history (when prompt is focused)",
-    "  Tab/Shift+Tab  History autocomplete cycle (when prompt is focused)",
+    "- Ctrl+I / Cmd+I: Focus prompt input",
+    "- Alt+ArrowUp: Jump to previous command output block",
+    "- Alt+ArrowDown: Jump to next command output block",
+    "- ArrowUp / ArrowDown: Command history (when prompt is focused)",
+    "- Tab / Shift+Tab: History autocomplete cycle (when prompt is focused)",
   ].join("\n");
 
 // Builds the top-level command index shown for the base help command.
 export const renderHelpIndex = () => {
-  const nameCol = Math.max(...COMMAND_NAMES.map((n) => n.length), 7);
   const lines = [
-    "Available commands:",
+    "Available commands",
+    "==================",
     "",
-    `${pad("COMMAND", nameCol)}  DESCRIPTION`,
-    `${"-".repeat(nameCol)}  ${"-".repeat(42)}`,
-    ...COMMAND_NAMES.map(
-      (name) => `${pad(name, nameCol)}  ${COMMANDS[name].description}`,
-    ),
+    ...COMMAND_NAMES.map((name) => `- ${name}: ${COMMANDS[name].description}`),
     "",
     renderShortcuts(),
     "",
-    "Run `help <command>` for detailed usage.",
+    "Tip: run `help <command>` for detailed usage.",
   ];
   return lines.join("\n");
 };
@@ -55,17 +47,17 @@ export const renderHelpCommand = (commandName: string) => {
   }
 
   const sections = [
-    `${cmd.name}`,
-    `${"-".repeat(cmd.name.length)}`,
-    cmd.description,
+    `Command: ${cmd.name}`,
+    `${"=".repeat(9 + cmd.name.length)}`,
+    `Description: ${cmd.description}`,
     "",
     "Usage:",
-    ...cmd.usage.map((u) => `  ${u}`),
+    ...cmd.usage.map((u) => `- ${u}`),
     "",
     renderFlags(cmd.flags),
     "",
     "Examples:",
-    ...cmd.examples.map((e) => `  ${e}`),
+    ...cmd.examples.map((e) => `- ${e}`),
   ];
 
   if (cmd.name === "help") {

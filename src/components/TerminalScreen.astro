@@ -116,8 +116,6 @@
         const alignSessionToNodeStart = (node: HTMLElement) => {
           if (!sessionLog) return;
 
-          node.scrollIntoView({ block: "start", inline: "nearest" });
-
           let targetTop = 0;
           let foundSessionAncestor = false;
           let current: HTMLElement | null = node;
