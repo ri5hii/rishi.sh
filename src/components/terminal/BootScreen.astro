@@ -7,12 +7,16 @@ import TerminalScreen from "./TerminalScreen.astro";
   <!-- Header -->
   <header class="Header">
     <div class="HeaderInner">
-      <button class="Button Button--switch">
+      <a
+        class="Button Button--switch"
+        href="/switch"
+        aria-label="Open switch portfolio mode"
+      >
         <span class="material-symbols-outlined ButtonIndicator"
           >settings_input_component</span
         >
         <span class="ButtonText">Switch UI</span>
-      </button>
+      </a>
     </div>
     <div class="Banner">
       <div class="BannerStack" aria-hidden="true">

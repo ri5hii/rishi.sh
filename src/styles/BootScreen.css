@@ -1,8 +1,8 @@
 /*
   BootScreen styles define terminal shell layout, responsive behavior, and command output themes.
   Primary markup sources:
-  - src/components/BootScreen.astro (Boot shell, header, banner)
-  - src/components/TerminalScreen.astro (window, logs, prompt)
+  - src/components/terminal/BootScreen.astro (Boot shell, header, banner)
+  - src/components/terminal/TerminalScreen.astro (window, logs, prompt)
   - Runtime-inserted nodes from TerminalScreen script (.Session* blocks)
 */
 @layer components {

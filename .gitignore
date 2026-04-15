@@ -23,8 +23,11 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 
+richardapps-web/
+
 design.md
 progress-direction.md
 redundancy-report.md
+switch-directions.md
 
 Hometemplate.html
