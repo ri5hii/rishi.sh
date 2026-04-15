@@ -34,5 +34,8 @@
   }
 }
 
-/* Component-level styles. */
+/* Component-level for main portfolio styles. */
 @import "./BootScreen.css";
+
+/* Component-level for switch portfolio styles. */
+@import "./switch.css";

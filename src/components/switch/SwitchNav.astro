@@ -1,0 +1,48 @@
+---
+interface Props {
+  current?: "home" | "projects" | "blog" | "resources" | "about" | "contact";
+}
+
+const { current = "home" } = Astro.props;
+
+const navItems = [
+  { key: "home", label: "Home", href: "/switch" },
+  { key: "projects", label: "Projects", href: "/switch/projects" },
+  { key: "blog", label: "Blog", href: "/switch/blog" },
+  { key: "resources", label: "Resources", href: "/switch/resources" },
+  { key: "about", label: "About", href: "/switch/about" },
+  { key: "contact", label: "Contact", href: "/switch/contact" },
+] as const;
+---
+
+<header class="Header">
+  <div class="HeaderInner">
+    <nav class="NavBar" aria-label="Switch navigation">
+      {
+        navItems.map((item) => {
+          const isActive = item.key === current;
+          return (
+            <a
+              href={item.href}
+              class:list={{ NavLink: true, "is-active": isActive }}
+              aria-current={isActive ? "page" : undefined}
+            >
+              {item.label}
+            </a>
+          );
+        })
+      }
+    </nav>
+
+    <a
+      class="Button Button--switch"
+      href="/"
+      aria-label="Back to terminal mode"
+    >
+      <span class="material-symbols-outlined ButtonIndicator"
+        >settings_input_component</span
+      >
+      <span class="ButtonText">Switch UI</span>
+    </a>
+  </div>
+</header>
