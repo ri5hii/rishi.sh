@@ -24,14 +24,14 @@
   /* Full-width top header bar. */
   .SwitchApp .Header {
     width: 100vw;
+    height: clamp(3rem, 6vw, 3.8rem);
     max-width: none;
     margin: 0;
     border: 1px solid rgba(255, 255, 255, 0.25);
     background: rgba(0, 20, 22, 0.82);
     box-shadow: 0 16px 34px -20px rgba(0, 0, 0, 0.8);
     padding: 0;
-    display: grid;
-    flex-shrink: 0;
+    display: block;
   }
 
   /* Header row: nav links and Switch UI button on one line. */

@@ -54,6 +54,13 @@ export const COMMANDS: Record<string, CommandDefinition> = {
     examples: ["blog", "blog 1"],
     flags: [],
   },
+  resume: {
+    name: "resume",
+    description: "Open resume PDF in a new tab.",
+    usage: ["resume"],
+    examples: ["resume"],
+    flags: [],
+  },
   contact: {
     name: "contact",
     description: "Show contact and social links.",
@@ -76,13 +83,6 @@ export const COMMANDS: Record<string, CommandDefinition> = {
         description: "Open the default mail client.",
       },
     ],
-  },
-  resume: {
-    name: "resume",
-    description: "Open resume PDF in a new tab.",
-    usage: ["resume"],
-    examples: ["resume"],
-    flags: [],
   },
   whoami: {
     name: "whoami",
@@ -114,4 +114,4 @@ export const COMMANDS: Record<string, CommandDefinition> = {
 };
 
 // Sorted command names used by the help index renderer.
-export const COMMAND_NAMES = Object.keys(COMMANDS).sort();
+export const COMMAND_NAMES = Object.keys(COMMANDS);
