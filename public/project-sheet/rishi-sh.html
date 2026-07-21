@@ -4,42 +4,100 @@ rishi.sh
 Repository: <a href="https://github.com/ri5hii/rishi.sh">github.com/ri5hii/rishi.sh</a>
 Portfolio: <a href="https://rishi.sh">rishi.sh</a>
 
-Interactive terminal portfolio focused on usability, clarity, and engineering signal.
+Interactive terminal-driven portfolio — not a website, a command-line interface.
+
+Users interact by typing commands into a simulated terminal that responds with
+rich output: profile data, project details, blog entries, system info.
 
 Scope:
-- Command-driven navigation
-- Rich output formatting
-- Mobile-first terminal ergonomics
++- command-driven navigation with flag parsing and autocomplete
++- rich HTML output formatting inside terminal frames
++- dual-mode architecture: terminal + switch UI
 
 Goal:
-Deliver high-signal personal branding while preserving terminal aesthetics.</pre>
+Deliver high-signal personal identity through interaction, not pages.
+  </pre>
 
   <div class="MarkdownCards">
     <div class="MarkdownCard">
       <h3 class="MarkdownCardTitle">Tech Stack</h3>
       <ul>
-        <li>- Astro</li>
-        <li>- TypeScript</li>
-        <li>TailwindCSS</li>
+        <li>Astro (static-first, island architecture)</li>
+        <li>TypeScript</li>
+        <li>Tailwind CSS v4</li>
         <li>Bun</li>
+        <li>Vanilla JS (no framework islands)</li>
+        <li>Vercel (deployment)</li>
+      </ul>
+    </div>
+
+    <div class="MarkdownCard">
+      <h3 class="MarkdownCardTitle">Commands</h3>
+      <ul>
+        <li>- whoami → profile card with avatar</li>
+        <li>- neofetch → ASCII art + system info</li>
+        <li>- about → skills, background, links</li>
+        <li>- projects → live GitHub repos + project sheets</li>
+        <li>- blog → process/outcomes cards</li>
+        <li>- contact → email, LinkedIn, GitHub</li>
+        <li>- resume → opens PDF</li>
+        <li>- help → per-command docs with flags/examples</li>
+      </ul>
+    </div>
+
+    <div class="MarkdownCard">
+      <h3 class="MarkdownCardTitle">Terminal UX</h3>
+      <ul>
+        <li>ArrowUp/Down command history navigation</li>
+        <li>Tab autocomplete with ghost preview</li>
+        <li>Boot animation with character-by-character typing</li>
+        <li>Session expansion on first command</li>
+        <li>Ctrl/Cmd+I to focus prompt</li>
+        <li>Mobile responsive with compact layout</li>
+        <li>ASCII banner glitch animation</li>
+      </ul>
+    </div>
+
+    <div class="MarkdownCard">
+      <h3 class="MarkdownCardTitle">Dual-Mode Architecture</h3>
+      <ul>
+        <li>
+          Terminal Mode (/ and /terminal):
+          <ul>
+            <li>- Interactive CLI portfolio</li>
+            <li>- Full command engine with dispatch</li>
+          </ul>
+        </li>
+        <li>
+          Switch UI Mode (/switch/*):
+          <ul>
+            <li>- Traditional multi-page layout</li>
+            <li>- Nav tabs: Home, Projects, Blog, Resources, About, Contact</li>
+            <li>- Terminus font, separate styling system</li>
+          </ul>
+        </li>
+        <li>Toggle button between modes in both headers</li>
+      </ul>
+    </div>
+
+    <div class="MarkdownCard">
+      <h3 class="MarkdownCardTitle">Content Architecture</h3>
+      <ul>
+        <li>GitHub API integration for live repo data</li>
+        <li>Project sheets as static HTML with manifest mapping</li>
+        <li>Local blog posts with structured rendering</li>
+        <li>About page as standalone HTML fragment</li>
+        <li>HTML sanitization before DOM injection</li>
       </ul>
     </div>
 
     <div class="MarkdownCard">
       <h3 class="MarkdownCardTitle">Versioning</h3>
       <ul>
-        <li>v0.3 active</li>
-        <li>Command hardening complete</li>
-        <li>Responsive output pass ongoing</li>
-      </ul>
-    </div>
-
-    <div class="MarkdownCard">
-      <h3 class="MarkdownCardTitle">Highlights</h3>
-      <ul>
-        <li>Input history and Tab autocomplete</li>
-        <li>Split neofetch rendering for mobile</li>
-        <li>Local content architecture for about/projects/blog</li>
+        <li>v0.1 — terminal shell, basic commands</li>
+        <li>v0.2 — command hardening, autocomplete, history</li>
+        <li>v0.3 — responsive output, content architecture</li>
+        <li>v0.4 — switch UI skeleton (in progress)</li>
       </ul>
     </div>
   </div>
